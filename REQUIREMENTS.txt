@@ -1,0 +1,179 @@
+FORECASTIFY EDU - PROJECT REQUIREMENTS
+========================================
+
+PROJECT OVERVIEW:
+================
+FORECASTIFY EDU is an educational forecasting system designed to teach students 
+about sales forecasting based on historical data. The system allows students to 
+input past sales data and calculate future forecasts using percentage adjustments.
+
+CORE FUNCTIONALITY:
+==================
+
+1. DATA INPUT SYSTEM:
+   - Table interface for entering historical sales data
+   - Support for up to 10 years of data (minimum 5 years)
+   - Input fields for year and sales units
+   - Dynamic table that can expand/contract based on data needs
+
+2. FORECASTING CALCULATION:
+   - Calculate future sales based on percentage adjustments
+   - Example calculations:
+     * 2025: Previous year + 10%
+     * 2026: Previous year + 20%
+     * 2027: Previous year - 5%
+   - Flexible percentage system for different exercises
+
+3. GRAPH VISUALIZATION:
+   - Line graph showing both actual and forecasted sales
+   - X-axis: Years (2020-2027 or custom range)
+   - Y-axis: Sales Units
+   - Color coding:
+     * Blue Line = Actual Sales (historical data)
+     * Orange Dashed Line = Forecasted Sales (future predictions)
+   - Multiple graph type options
+
+4. EDUCATIONAL FEATURES:
+   - Exercise-based learning system
+   - Step-by-step calculation display
+   - Educational explanations for forecasting concepts
+   - Interactive learning experience
+
+TECHNICAL REQUIREMENTS:
+=======================
+
+Frontend:
+- React 19.1.0 (already set up)
+- Chart.js or Recharts for graph visualization
+- Responsive design for mobile/desktop
+- Modern UI/UX with educational theme
+
+Data Management:
+- State management for sales data
+- Local storage for saving exercises
+- Export functionality for results
+
+User Interface:
+- Clean, educational interface
+- Color-coded elements (red/blue as mentioned in requirements)
+- Intuitive data input forms
+- Clear graph displays
+
+SYSTEM FLOW:
+============
+
+1. STUDENT INPUT:
+   - Enter historical sales data in table format
+   - Specify number of years (5-10 years)
+   - Input sales units for each year
+
+2. FORECASTING CALCULATION:
+   - System calculates future sales based on given percentages
+   - Display calculation steps for educational purposes
+   - Show intermediate calculations
+
+3. GRAPH GENERATION:
+   - Generate line graph with actual vs forecasted data
+   - Apply color coding (blue for actual, orange for forecast)
+   - Include legend and proper labeling
+
+4. EDUCATIONAL DISPLAY:
+   - Show complete data table with calculations
+   - Display forecasting methodology
+   - Provide learning insights
+
+FEATURES TO IMPLEMENT:
+======================
+
+Phase 1 - Core Features:
+- [ ] Data input table component
+- [ ] Basic forecasting calculation logic
+- [ ] Simple line graph visualization
+- [ ] Basic styling and layout
+
+Phase 2 - Enhanced Features:
+- [ ] Multiple graph types (bar, line, area)
+- [ ] Dynamic color schemes
+- [ ] Export functionality
+- [ ] Save/load exercises
+
+Phase 3 - Educational Features:
+- [ ] Step-by-step calculation display
+- [ ] Educational tooltips
+- [ ] Exercise templates
+- [ ] Progress tracking
+
+Phase 4 - Polish:
+- [ ] Responsive design
+- [ ] Accessibility features
+- [ ] Performance optimization
+- [ ] Error handling
+
+EXAMPLE EXERCISE:
+================
+
+Based on the document, here's a sample exercise:
+
+Table 1: Product Sales Data (Past 5 Years)
+Year    | Sales (Units)
+2020    | [Student Input]
+2021    | [Student Input]
+2022    | [Student Input]
+2023    | [Student Input]
+2024    | [Student Input]
+
+Forecasting Requirements:
+- 2025: +10% increase from 2024
+- 2026: +20% increase from 2025
+- 2027: -5% decrease from 2026
+
+Expected Output:
+- Complete data table with calculations
+- Line graph showing actual vs forecasted sales
+- Educational explanation of forecasting process
+
+TECHNICAL STACK:
+================
+
+Current Setup:
+- React 19.1.0
+- Vite 7.0.4
+- ESLint for code quality
+
+Recommended Additions:
+- Chart.js or Recharts for graphs
+- Tailwind CSS for styling
+- React Hook Form for form handling
+- Local storage for data persistence
+
+FILE STRUCTURE:
+===============
+
+src/
+├── components/
+│   ├── DataInput/
+│   ├── ForecastingCalculator/
+│   ├── GraphVisualization/
+│   └── EducationalDisplay/
+├── hooks/
+│   ├── useForecasting.js
+│   └── useGraphData.js
+├── utils/
+│   ├── calculations.js
+│   └── graphHelpers.js
+└── styles/
+    └── components.css
+
+NEXT STEPS:
+===========
+
+1. Install additional dependencies (Chart.js, Tailwind CSS)
+2. Create component structure
+3. Implement data input system
+4. Build forecasting calculation logic
+5. Add graph visualization
+6. Polish UI/UX
+7. Add educational features
+
+This project aims to create an interactive, educational tool for teaching 
+sales forecasting concepts to students in an engaging and visual manner. 
