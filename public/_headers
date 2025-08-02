@@ -1,0 +1,53 @@
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-XSS-Protection: 1; mode=block
+
+/*.js
+  Content-Type: application/javascript
+
+/*.jsx
+  Content-Type: application/javascript
+
+/*.mjs
+  Content-Type: application/javascript
+
+/*.css
+  Content-Type: text/css
+
+/*.html
+  Content-Type: text/html
+
+/*.json
+  Content-Type: application/json
+
+/*.svg
+  Content-Type: image/svg+xml
+
+/*.png
+  Content-Type: image/png
+
+/*.jpg
+  Content-Type: image/jpeg
+
+/*.jpeg
+  Content-Type: image/jpeg
+
+/*.gif
+  Content-Type: image/gif
+
+/*.ico
+  Content-Type: image/x-icon
+
+/*.woff
+  Content-Type: font/woff
+
+/*.woff2
+  Content-Type: font/woff2
+
+/*.ttf
+  Content-Type: font/ttf
+
+/*.eot
+  Content-Type: application/vnd.ms-fontobject 
