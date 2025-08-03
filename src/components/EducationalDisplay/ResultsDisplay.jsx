@@ -1,226 +1,164 @@
 import { useState } from 'react';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 
-const ResultsDisplay = ({ historicalData, forecastedData, statistics }) => {
+const ResultsDisplay = ({ historicalData, forecastedData, statistics, onExportClick }) => {
   const [showCalculations, setShowCalculations] = useState(false);
 
-  const exportToPDF = async () => {
-    const element = document.getElementById('results-content');
-    if (!element) return;
-
-    try {
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#ffffff'
-      });
-
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const imgWidth = 210;
-      const pageHeight = 295;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
-
-      let position = 0;
-
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
-
-      pdf.save('forecastify-results.pdf');
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      alert('Error generating PDF. Please try again.');
+  const handleExportClick = () => {
+    if (onExportClick) {
+      onExportClick();
     }
   };
 
   return (
     <div id="results-content" style={{ backgroundColor: 'white', color: 'black' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <h3 style={{ fontSize: '1.3rem', fontWeight: '600', color: 'black' }}>📋 Results & Calculations</h3>
-        <button
-          onClick={exportToPDF}
-          style={{
-            backgroundColor: '#3498db',
-            color: 'white',
-            padding: '12px 24px',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            fontSize: '1rem',
-            fontWeight: '500'
-          }}
-        >
-          📄 Export PDF
-        </button>
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        marginBottom: 'var(--space-6)',
+        flexWrap: 'wrap',
+        gap: 'var(--space-4)'
+      }}>
+        <h3 className="section-title">📋 Results & Calculations</h3>
+        <div style={{
+          display: 'flex',
+          gap: 'var(--space-3)',
+          flexWrap: 'wrap'
+        }}>
+          <button
+            onClick={handleExportClick}
+            className="btn btn-primary"
+          >
+            📄 Export PDF
+          </button>
+          <button
+            onClick={() => {
+              if (onExportClick) {
+                onExportClick('excel');
+              }
+            }}
+            className="btn btn-success"
+          >
+            📊 Export Excel
+          </button>
+        </div>
       </div>
 
       {/* Summary Statistics */}
-      <div style={{ 
-        background: '#f8f9fa',
-        border: '1px solid #e9ecef',
-        borderRadius: '10px',
-        padding: '20px',
-        marginBottom: '20px'
-      }}>
-        <h4 style={{ marginBottom: '15px', fontSize: '1.1rem', color: 'black' }}>📊 Summary Statistics</h4>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px' }}>
-          <div style={{ color: 'black' }}>
-            <strong>Total Historical Sales:</strong> {statistics.totalHistorical?.toLocaleString()} units
+      <div className="stats-grid">
+        <div className="stat-card">
+          <div className="stat-title">Total Historical Sales</div>
+          <div className="stat-value">{statistics.totalHistorical?.toLocaleString()}</div>
+          <div className="stat-change">units</div>
+        </div>
+        
+        <div className="stat-card">
+          <div className="stat-title">Total Forecasted Sales</div>
+          <div className="stat-value">{statistics.totalForecasted?.toLocaleString()}</div>
+          <div className="stat-change">units</div>
+        </div>
+        
+        <div className="stat-card">
+          <div className="stat-title">Average Growth Rate</div>
+          <div className="stat-value">{statistics.averageGrowthRate?.toFixed(2)}%</div>
+          <div className={`stat-change ${statistics.averageGrowthRate >= 0 ? 'positive' : 'negative'}`}>
+            {statistics.averageGrowthRate >= 0 ? '↗' : '↘'} Historical trend
           </div>
-          <div style={{ color: 'black' }}>
-            <strong>Total Forecasted Sales:</strong> {statistics.totalForecasted?.toLocaleString()} units
-          </div>
-          <div style={{ color: 'black' }}>
-            <strong>Average Growth Rate:</strong> {statistics.averageGrowthRate?.toFixed(2)}%
-          </div>
-          <div style={{ color: 'black' }}>
-            <strong>Projected Growth:</strong> {statistics.projectedGrowth?.toFixed(2)}%
+        </div>
+        
+        <div className="stat-card">
+          <div className="stat-title">Projected Growth</div>
+          <div className="stat-value">{statistics.projectedGrowth?.toFixed(2)}%</div>
+          <div className={`stat-change ${statistics.projectedGrowth >= 0 ? 'positive' : 'negative'}`}>
+            {statistics.projectedGrowth >= 0 ? '↗' : '↘'} Forecasted
           </div>
         </div>
       </div>
 
       {/* Detailed Results Table */}
-      <div style={{ marginBottom: '20px' }}>
-        <h4 style={{ marginBottom: '15px', fontSize: '1.1rem', color: 'black' }}>📈 Detailed Results</h4>
-        <table style={{
-          width: '100%',
-          borderCollapse: 'collapse',
-          background: 'white',
-          border: '1px solid #e9ecef',
-          borderRadius: '10px',
-          overflow: 'hidden',
-          boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
-          marginBottom: '20px'
-        }}>
-          <thead style={{ backgroundColor: '#f8f9fa' }}>
-            <tr>
-              <th style={{
-                padding: '15px',
-                textAlign: 'left',
-                fontSize: '0.9rem',
-                fontWeight: '600',
-                color: 'black',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px',
-                borderBottom: '1px solid #e9ecef'
-              }}>
-                Year
-              </th>
-              <th style={{
-                padding: '15px',
-                textAlign: 'left',
-                fontSize: '0.9rem',
-                fontWeight: '600',
-                color: 'black',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px',
-                borderBottom: '1px solid #e9ecef'
-              }}>
-                Type
-              </th>
-              <th style={{
-                padding: '15px',
-                textAlign: 'left',
-                fontSize: '0.9rem',
-                fontWeight: '600',
-                color: 'black',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px',
-                borderBottom: '1px solid #e9ecef'
-              }}>
-                Sales (Units)
-              </th>
-              <th style={{
-                padding: '15px',
-                textAlign: 'left',
-                fontSize: '0.9rem',
-                fontWeight: '600',
-                color: 'black',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px',
-                borderBottom: '1px solid #e9ecef'
-              }}>
-                Change (%)
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {historicalData.map((item, index) => (
-              <tr key={`hist-${index}`} style={{ borderBottom: '1px solid #e9ecef' }}>
-                <td style={{ padding: '15px', fontSize: '0.875rem', color: 'black' }}>{item.year}</td>
-                <td style={{ padding: '15px', fontSize: '0.875rem', color: 'black', fontWeight: '500' }}>Historical</td>
-                <td style={{ padding: '15px', fontSize: '0.875rem', color: 'black' }}>{item.sales.toLocaleString()}</td>
-                <td style={{ padding: '15px', fontSize: '0.875rem', color: 'black' }}>
-                  {index > 0 
-                    ? (((item.sales - historicalData[index - 1].sales) / historicalData[index - 1].sales) * 100).toFixed(2)
-                    : '-'
-                  }%
-                </td>
-              </tr>
-            ))}
-            {forecastedData.map((item, index) => (
-              <tr key={`forecast-${index}`} style={{ borderBottom: '1px solid #e9ecef' }}>
-                <td style={{ padding: '15px', fontSize: '0.875rem', color: 'black' }}>{item.year}</td>
-                <td style={{ padding: '15px', fontSize: '0.875rem', color: 'black', fontWeight: '500' }}>Forecasted</td>
-                <td style={{ padding: '15px', fontSize: '0.875rem', color: 'black' }}>{item.sales.toLocaleString()}</td>
-                <td style={{ padding: '15px', fontSize: '0.875rem', color: 'black' }}>
-                  {item.percentage >= 0 ? '+' : ''}{item.percentage}%
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div style={{ marginBottom: 'var(--space-6)' }}>
+        <h4 className="section-title">📈 Detailed Results</h4>
+        <div className="results-table">
+          <div className="results-table-header">
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: '1fr 1fr 1fr 1fr',
+              gap: 'var(--space-4)',
+              fontWeight: '600',
+              color: 'var(--gray-700)'
+            }}>
+              <div>Year</div>
+              <div>Type</div>
+              <div>Sales (Units)</div>
+              <div>Change (%)</div>
+            </div>
+          </div>
+          
+          {historicalData.map((item, index) => (
+            <div key={`hist-${index}`} className="results-table-row">
+              <div className="results-table-cell">{item.year}</div>
+              <div className="results-table-cell highlight">Historical</div>
+              <div className="results-table-cell">{item.sales.toLocaleString()}</div>
+              <div className="results-table-cell">
+                {index > 0 
+                  ? (((item.sales - historicalData[index - 1].sales) / historicalData[index - 1].sales) * 100).toFixed(2)
+                  : '-'
+                }%
+              </div>
+            </div>
+          ))}
+          
+          {forecastedData.map((item, index) => (
+            <div key={`forecast-${index}`} className="results-table-row">
+              <div className="results-table-cell">{item.year}</div>
+              <div className="results-table-cell highlight">Forecasted</div>
+              <div className="results-table-cell">{item.sales.toLocaleString()}</div>
+              <div className="results-table-cell">
+                {item.percentage >= 0 ? '+' : ''}{item.percentage}%
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Calculations Toggle */}
-      <div style={{ marginBottom: '20px' }}>
-        <button
+      <div className="toggle-section">
+        <div 
+          className="toggle-header"
           onClick={() => setShowCalculations(!showCalculations)}
-          style={{
-            backgroundColor: '#e74c3c',
-            color: 'white',
-            padding: '12px 24px',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            fontSize: '1rem',
-            fontWeight: '500',
-            marginBottom: '15px'
-          }}
         >
-          {showCalculations ? '🔽 Hide' : '🔼 Show'} Calculation Steps
-        </button>
+          <div className="toggle-title">🧮 Calculation Steps</div>
+          <div className={`toggle-icon ${showCalculations ? 'rotated' : ''}`}>
+            {showCalculations ? '🔽' : '🔼'}
+          </div>
+        </div>
 
         {showCalculations && (
-          <div style={{
-            background: '#f8f9fa',
-            border: '1px solid #e9ecef',
-            borderRadius: '10px',
-            padding: '20px'
-          }}>
-            <h4 style={{ marginBottom: '15px', color: 'black' }}>🧮 Calculation Steps</h4>
+          <div className="toggle-content">
             {forecastedData.map((item, index) => (
               <div key={index} style={{ 
-                marginBottom: '15px',
-                padding: '15px',
-                background: 'white',
-                borderRadius: '8px',
-                border: '1px solid #e9ecef'
+                marginBottom: 'var(--space-4)',
+                padding: 'var(--space-4)',
+                background: 'var(--gray-50)',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--gray-200)'
               }}>
-                <h5 style={{ marginBottom: '10px', color: 'black' }}>
+                <h5 style={{ 
+                  marginBottom: 'var(--space-2)', 
+                  color: 'var(--gray-800)',
+                  fontWeight: '600'
+                }}>
                   {item.year} Forecast Calculation:
                 </h5>
-                <p style={{ fontFamily: 'monospace', fontSize: '0.9rem', color: 'black' }}>
+                <p style={{ 
+                  fontFamily: 'monospace', 
+                  fontSize: '0.9rem', 
+                  color: 'var(--gray-700)',
+                  background: 'var(--white)',
+                  padding: 'var(--space-3)',
+                  borderRadius: 'var(--radius-sm)',
+                  border: '1px solid var(--gray-200)'
+                }}>
                   {item.calculation}
                 </p>
               </div>
@@ -229,21 +167,140 @@ const ResultsDisplay = ({ historicalData, forecastedData, statistics }) => {
         )}
       </div>
 
-      {/* Insights */}
-      <div style={{
-        background: '#f8f9fa',
-        border: '1px solid #e9ecef',
-        borderRadius: '10px',
-        padding: '20px'
-      }}>
-        <h4 style={{ marginBottom: '15px', fontSize: '1.1rem', color: 'black' }}>💡 Insights</h4>
-        <ul style={{ listStyle: 'none', padding: 0, color: 'black' }}>
-          <li style={{ marginBottom: '8px' }}>• Historical data shows {statistics.averageGrowthRate >= 0 ? 'positive' : 'negative'} growth trend</li>
-          <li style={{ marginBottom: '8px' }}>• Forecasted growth rate: {statistics.projectedGrowth >= 0 ? '+' : ''}{statistics.projectedGrowth?.toFixed(2)}%</li>
-          <li style={{ marginBottom: '8px' }}>• Total projected sales: {statistics.totalForecasted?.toLocaleString()} units</li>
-          <li style={{ marginBottom: '8px' }}>• This represents a {statistics.projectedGrowth >= 0 ? 'growth' : 'decline'} in sales performance</li>
-        </ul>
+      {/* Formula Display */}
+      <div style={{ marginBottom: 'var(--space-6)' }}>
+        <div 
+          className="toggle-header"
+          onClick={() => setShowCalculations(!showCalculations)}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: 'var(--space-4)',
+            background: 'var(--bg-card-light)',
+            borderRadius: 'var(--radius-lg)',
+            cursor: 'pointer',
+            transition: 'background-color 0.2s ease',
+            border: '1px solid var(--border-color)'
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.background = 'var(--bg-card)';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.background = 'var(--bg-card-light)';
+          }}
+        >
+          <h4 className="section-title" style={{ margin: 0 }}>🧮 Calculation Formulas</h4>
+          <div style={{ 
+            fontSize: '1.2rem',
+            transition: 'transform 0.2s ease',
+            transform: showCalculations ? 'rotate(180deg)' : 'rotate(0deg)'
+          }}>
+            🔽
+          </div>
+        </div>
+
+        {showCalculations && (
+          <div style={{
+            background: 'var(--bg-card-light)',
+            padding: 'var(--space-4)',
+            borderRadius: 'var(--radius-lg)',
+            border: '1px solid var(--border-color)',
+            marginTop: 'var(--space-2)',
+            borderTopLeftRadius: 0,
+            borderTopRightRadius: 0
+          }}>
+            <div style={{ marginBottom: 'var(--space-4)' }}>
+              <h5 style={{ 
+                fontWeight: '600', 
+                color: 'var(--text-primary)',
+                marginBottom: 'var(--space-2)'
+              }}>
+                📈 Projected Growth Formula:
+              </h5>
+              <div style={{
+                fontFamily: 'monospace',
+                fontSize: '0.9rem',
+                background: 'var(--white)',
+                padding: 'var(--space-3)',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--border-color)',
+                color: 'var(--text-secondary)'
+              }}>
+                Projected Growth = ((First Forecasted - Last Historical) / Last Historical) × 100
+              </div>
+              <div style={{
+                fontSize: '0.9rem',
+                color: 'var(--text-secondary)',
+                marginTop: 'var(--space-2)',
+                fontStyle: 'italic'
+              }}>
+                Example: (({statistics?.firstForecasted || 6380} - {statistics?.lastHistorical || 5800}) / {statistics?.lastHistorical || 5800}) × 100 = {statistics?.projectedGrowth?.toFixed(2)}%
+              </div>
+            </div>
+
+            <div style={{ marginBottom: 'var(--space-4)' }}>
+              <h5 style={{ 
+                fontWeight: '600', 
+                color: 'var(--text-primary)',
+                marginBottom: 'var(--space-2)'
+              }}>
+                📊 Average Growth Rate Formula:
+              </h5>
+              <div style={{
+                fontFamily: 'monospace',
+                fontSize: '0.9rem',
+                background: 'var(--white)',
+                padding: 'var(--space-3)',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--border-color)',
+                color: 'var(--text-secondary)'
+              }}>
+                Average Growth = Sum of Yearly Growth Rates / Number of Years
+              </div>
+              <div style={{
+                fontSize: '0.9rem',
+                color: 'var(--text-secondary)',
+                marginTop: 'var(--space-2)',
+                fontStyle: 'italic'
+              }}>
+                Example: ({statistics?.growthRates?.join(' + ') || '10 + 5.45'}) / {statistics?.growthRates?.length || 2} = {statistics?.averageGrowthRate?.toFixed(2)}%
+              </div>
+            </div>
+
+            <div>
+              <h5 style={{ 
+                fontWeight: '600', 
+                color: 'var(--text-primary)',
+                marginBottom: 'var(--space-2)'
+              }}>
+                🔢 Forecast Calculation Formula:
+              </h5>
+              <div style={{
+                fontFamily: 'monospace',
+                fontSize: '0.9rem',
+                background: 'var(--white)',
+                padding: 'var(--space-3)',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--border-color)',
+                color: 'var(--text-secondary)'
+              }}>
+                Forecasted Sales = Previous Year Sales × (1 + Percentage Change)
+              </div>
+              <div style={{
+                fontSize: '0.9rem',
+                color: 'var(--text-secondary)',
+                marginTop: 'var(--space-2)',
+                fontStyle: 'italic'
+              }}>
+                Example: {statistics?.lastHistorical || 5800} × (1 + 0.10) = {statistics?.firstForecasted || 6380} units
+              </div>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Remove Educational Insights section */}
     </div>
   );
 };

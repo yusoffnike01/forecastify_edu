@@ -1,8 +1,6 @@
 import { useState } from 'react';
 
 const ForecastingParameters = ({ parameters, onParametersChange }) => {
-  const [forecastYears, setForecastYears] = useState(3);
-
   const handleYearChange = (index, value) => {
     const newParameters = [...parameters];
     newParameters[index] = { ...newParameters[index], year: parseInt(value) || 0 };
@@ -15,20 +13,22 @@ const ForecastingParameters = ({ parameters, onParametersChange }) => {
     onParametersChange(newParameters);
   };
 
-  const addForecastYear = () => {
-    if (forecastYears < 5) {
-      const lastYear = parameters[parameters.length - 1]?.year || 2024;
-      const newParameters = [...parameters, { year: lastYear + 1, percentage: 0 }];
-      onParametersChange(newParameters);
-      setForecastYears(forecastYears + 1);
+  const handleAddYear = () => {
+    if (parameters.length < 5) {
+      const lastYear = parameters.length > 0 ? parameters[parameters.length - 1].year : 2024;
+      const newYear = lastYear + 1;
+      const newParameter = {
+        year: newYear,
+        percentage: 10
+      };
+      onParametersChange([...parameters, newParameter]);
     }
   };
 
-  const removeForecastYear = () => {
-    if (forecastYears > 1) {
+  const handleRemoveYear = () => {
+    if (parameters.length > 1) {
       const newParameters = parameters.slice(0, -1);
       onParametersChange(newParameters);
-      setForecastYears(forecastYears - 1);
     }
   };
 
@@ -37,69 +37,94 @@ const ForecastingParameters = ({ parameters, onParametersChange }) => {
       <h3 className="section-title">📈 Forecasting Parameters</h3>
 
       {/* Year Controls */}
-      <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+      <div style={{ 
+        display: 'flex', 
+        gap: 'var(--space-3)', 
+        marginBottom: 'var(--space-6)',
+        flexWrap: 'wrap'
+      }}>
         <button
-          onClick={addForecastYear}
-          disabled={forecastYears >= 5}
-          className="btn btn-small btn-add"
-          style={{ opacity: forecastYears >= 5 ? 0.5 : 1, pointerEvents: forecastYears >= 5 ? 'none' : 'auto' }}
+          type="button"
+          className="btn btn-primary"
+          onClick={handleAddYear}
+          style={{ color: 'white' }}
         >
-          + Add Year
+          ➕ Add Year
         </button>
         <button
-          onClick={removeForecastYear}
-          disabled={forecastYears <= 1}
-          className="btn btn-small btn-remove"
-          style={{ opacity: forecastYears <= 1 ? 0.5 : 1, pointerEvents: forecastYears <= 1 ? 'none' : 'auto' }}
+          type="button"
+          className="btn btn-outline"
+          onClick={handleRemoveYear}
+          disabled={parameters.length <= 1}
+          style={{ color: 'var(--danger)' }}
         >
-          - Remove Year
+          ➖ Remove Year
         </button>
       </div>
 
       {/* Parameters Table */}
-      <div style={{ overflowX: 'auto' }}>
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>Year</th>
-              <th>Percentage Change</th>
-              <th>Example</th>
-            </tr>
-          </thead>
-          <tbody>
-            {parameters.map((param, index) => (
-              <tr key={index}>
-                <td>
-                  <input
-                    type="text"
-                    value={param.year}
-                    onChange={(e) => handleYearChange(index, e.target.value)}
-                    className="input-field input-small"
-                    placeholder="2025"
-                  />
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    value={param.percentage}
-                    onChange={(e) => handlePercentageChange(index, e.target.value)}
-                    className="input-field input-medium"
-                    placeholder="10"
-                  />
-                </td>
-                <td style={{ color: '#6b7280' }}>
-                  {param.percentage >= 0 ? '+' : ''}{param.percentage}% from previous year
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="data-table">
+        <div className="table-header">
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: '1fr 1fr 2fr auto',
+            gap: 'var(--space-4)',
+            fontWeight: '600',
+            color: 'var(--gray-700)'
+          }}>
+            <div>Year</div>
+            <div>Percentage Change</div>
+            <div>Description</div>
+            <div></div>
+          </div>
+        </div>
+        
+        {parameters.map((param, index) => (
+          <div key={index} className="table-row">
+            <div className="table-cell">
+              <input
+                type="text"
+                value={param.year}
+                onChange={(e) => handleYearChange(index, e.target.value)}
+                className="table-input"
+                placeholder="2025"
+              />
+            </div>
+            <div className="table-cell">
+              <input
+                type="text"
+                value={param.percentage}
+                onChange={(e) => handlePercentageChange(index, e.target.value)}
+                className="table-input"
+                placeholder="10"
+              />
+            </div>
+            <div className="table-cell">
+              <span style={{ 
+                fontSize: '0.875rem', 
+                color: 'var(--gray-600)',
+                fontStyle: 'italic'
+              }}>
+                {param.percentage >= 0 ? '+' : ''}{param.percentage}% from previous year
+              </span>
+            </div>
+            <div className="table-cell">
+              <span style={{ 
+                fontSize: '0.875rem', 
+                color: 'var(--gray-500)',
+                fontStyle: 'italic'
+              }}>
+                Row {index + 1}
+              </span>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Example Parameters */}
-      <div className="example-box">
-        <h4 className="example-title">💡 Example Parameters:</h4>
-        <ul className="example-list">
+      <div className="insights-section" style={{ marginTop: 'var(--space-6)' }}>
+        <h4 className="insights-title">💡 Example Parameters</h4>
+        <ul className="insights-list">
           <li>2025: +10% (10% increase from 2024)</li>
           <li>2026: +20% (20% increase from 2025)</li>
           <li>2027: -5% (5% decrease from 2026)</li>

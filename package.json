@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@types/recharts": "^2.0.1",
+    "framer-motion": "^12.23.12",
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.1",
     "react": "^19.1.0",

@@ -1,8 +1,6 @@
 import { useState } from 'react';
 
 const HistoricalDataTable = ({ data, onDataChange }) => {
-  const [years, setYears] = useState(5);
-
   const handleYearChange = (index, value) => {
     const newData = [...data];
     newData[index] = { ...newData[index], year: parseInt(value) || 0 };
@@ -15,19 +13,18 @@ const HistoricalDataTable = ({ data, onDataChange }) => {
     onDataChange(newData);
   };
 
-  const addYear = () => {
-    if (years < 10) {
-      const newData = [...data, { year: 2020 + years, sales: 0 }];
+  const handleAddYear = () => {
+    if (data.length < 10) {
+      const lastYear = data.length > 0 ? data[data.length - 1].year : 2020;
+      const newData = [...data, { year: lastYear + 1, sales: 0 }];
       onDataChange(newData);
-      setYears(years + 1);
     }
   };
 
-  const removeYear = () => {
-    if (years > 5) {
+  const handleRemoveYear = () => {
+    if (data.length > 1) {
       const newData = data.slice(0, -1);
       onDataChange(newData);
-      setYears(years - 1);
     }
   };
 
@@ -36,63 +33,88 @@ const HistoricalDataTable = ({ data, onDataChange }) => {
       <h3 className="section-title">📊 Historical Sales Data</h3>
 
       {/* Year Controls */}
-      <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+      <div style={{ 
+        display: 'flex', 
+        gap: 'var(--space-3)', 
+        marginBottom: 'var(--space-6)',
+        flexWrap: 'wrap'
+      }}>
         <button
-          onClick={addYear}
-          disabled={years >= 10}
-          className="btn btn-small btn-add"
-          style={{ opacity: years >= 10 ? 0.5 : 1, pointerEvents: years >= 10 ? 'none' : 'auto' }}
+          type="button"
+          className="btn btn-primary"
+          onClick={handleAddYear}
+          style={{ color: 'white' }}
         >
-          + Add Year
+          ➕ Add Year
         </button>
         <button
-          onClick={removeYear}
-          disabled={years <= 5}
-          className="btn btn-small btn-remove"
-          style={{ opacity: years <= 5 ? 0.5 : 1, pointerEvents: years <= 5 ? 'none' : 'auto' }}
+          type="button"
+          className="btn btn-outline"
+          onClick={handleRemoveYear}
+          disabled={data.length <= 1}
+          style={{ color: 'var(--danger)' }}
         >
-          - Remove Year
+          ➖ Remove Year
         </button>
       </div>
 
       {/* Data Table */}
-      <div style={{ overflowX: 'auto' }}>
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>Year</th>
-              <th>Sales (Units)</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((item, index) => (
-              <tr key={index}>
-                <td>
-                  <input
-                    type="text"
-                    value={item.year}
-                    onChange={(e) => handleYearChange(index, e.target.value)}
-                    className="input-field input-small"
-                    placeholder="2020"
-                  />
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    value={item.sales}
-                    onChange={(e) => handleSalesChange(index, e.target.value)}
-                    className="input-field input-medium"
-                    placeholder="1000"
-                  />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="data-table">
+        <div className="table-header">
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: '1fr 1fr auto',
+            gap: 'var(--space-4)',
+            fontWeight: '600',
+            color: 'var(--gray-700)'
+          }}>
+            <div>Year</div>
+            <div>Sales (Units)</div>
+            <div></div>
+          </div>
+        </div>
+        
+        {data.map((item, index) => (
+          <div key={index} className="table-row">
+            <div className="table-cell">
+              <input
+                type="text"
+                value={item.year}
+                onChange={(e) => handleYearChange(index, e.target.value)}
+                className="table-input"
+                placeholder="2020"
+              />
+            </div>
+            <div className="table-cell">
+              <input
+                type="text"
+                value={item.sales}
+                onChange={(e) => handleSalesChange(index, e.target.value)}
+                className="table-input"
+                placeholder="1000"
+              />
+            </div>
+            <div className="table-cell">
+              <span style={{ 
+                fontSize: '0.875rem', 
+                color: 'var(--gray-500)',
+                fontStyle: 'italic'
+              }}>
+                Row {index + 1}
+              </span>
+            </div>
+          </div>
+        ))}
       </div>
 
-      <p style={{ fontSize: '0.875rem', color: '#6b7280', fontStyle: 'italic', marginTop: '10px' }}>
-        * Enter historical sales data for 5 years (minimum 5, maximum 10)
+      <p style={{ 
+        fontSize: '0.875rem', 
+        color: 'var(--gray-500)', 
+        fontStyle: 'italic', 
+        marginTop: 'var(--space-4)',
+        textAlign: 'center'
+      }}>   
+        💡 Add or remove years as needed. Minimum 3 years required for calculation.
       </p>
     </div>
   );

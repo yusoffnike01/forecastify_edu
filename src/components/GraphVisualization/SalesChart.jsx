@@ -3,6 +3,16 @@ import { LineChart, Line, BarChart, Bar, AreaChart, Area, XAxis, YAxis, Cartesia
 const SalesChart = ({ data, graphType = 'line' }) => {
   console.log('SalesChart Data:', data); // Debug log
 
+  // Modern color palette matching the new design
+  const colors = {
+    historical: '#3b82f6', // Blue for historical data
+    forecasted: '#dc2626', // Red for forecasted data
+    grid: '#e2e8f0',
+    text: '#475569',
+    tooltip: '#ffffff',
+    tooltipBorder: '#cbd5e1'
+  };
+
   const renderChart = () => {
     const commonProps = {
       data: data,
@@ -14,25 +24,26 @@ const SalesChart = ({ data, graphType = 'line' }) => {
       case 'line':
         return (
           <LineChart {...commonProps}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+            <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
             <XAxis 
               dataKey="year" 
-              stroke="#666"
+              stroke={colors.text}
               fontSize={window.innerWidth <= 480 ? 10 : 12}
               tick={{ fontSize: window.innerWidth <= 480 ? 10 : 12 }}
             />
             <YAxis 
-              stroke="#666"
+              stroke={colors.text}
               fontSize={window.innerWidth <= 480 ? 10 : 12}
               tick={{ fontSize: window.innerWidth <= 480 ? 10 : 12 }}
             />
             <Tooltip 
               contentStyle={{
-                backgroundColor: 'white',
-                border: '1px solid #ccc',
-                borderRadius: '8px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                fontSize: window.innerWidth <= 480 ? '12px' : '14px'
+                backgroundColor: colors.tooltip,
+                border: `1px solid ${colors.tooltipBorder}`,
+                borderRadius: '12px',
+                boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                fontSize: window.innerWidth <= 480 ? '12px' : '14px',
+                padding: '12px'
               }}
             />
             <Legend 
@@ -44,20 +55,30 @@ const SalesChart = ({ data, graphType = 'line' }) => {
             <Line 
               type="monotone" 
               dataKey="historical" 
-              stroke="#3498db" 
-              strokeWidth={window.innerWidth <= 768 ? 2 : 3}
+              stroke={colors.historical} 
+              strokeWidth={window.innerWidth <= 768 ? 3 : 4}
               name="Historical Data"
-              dot={{ fill: '#3498db', strokeWidth: 2, r: window.innerWidth <= 768 ? 4 : 6 }}
+              dot={{ 
+                fill: colors.historical, 
+                strokeWidth: 2, 
+                r: window.innerWidth <= 768 ? 5 : 7,
+                stroke: '#ffffff'
+              }}
               connectNulls={false}
             />
             <Line 
               type="monotone" 
               dataKey="forecasted" 
-              stroke="#e74c3c" 
-              strokeWidth={window.innerWidth <= 768 ? 2 : 3}
+              stroke={colors.forecasted} 
+              strokeWidth={window.innerWidth <= 768 ? 3 : 4}
               strokeDasharray="5 5"
               name="Forecasted Data"
-              dot={{ fill: '#e74c3c', strokeWidth: 2, r: window.innerWidth <= 768 ? 4 : 6 }}
+              dot={{ 
+                fill: colors.forecasted, 
+                strokeWidth: 2, 
+                r: window.innerWidth <= 768 ? 5 : 7,
+                stroke: '#ffffff'
+              }}
               connectNulls={false}
             />
           </LineChart>
@@ -66,25 +87,26 @@ const SalesChart = ({ data, graphType = 'line' }) => {
       case 'bar':
         return (
           <BarChart {...commonProps}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+            <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
             <XAxis 
               dataKey="year" 
-              stroke="#666"
+              stroke={colors.text}
               fontSize={window.innerWidth <= 480 ? 10 : 12}
               tick={{ fontSize: window.innerWidth <= 480 ? 10 : 12 }}
             />
             <YAxis 
-              stroke="#666"
+              stroke={colors.text}
               fontSize={window.innerWidth <= 480 ? 10 : 12}
               tick={{ fontSize: window.innerWidth <= 480 ? 10 : 12 }}
             />
             <Tooltip 
               contentStyle={{
-                backgroundColor: 'white',
-                border: '1px solid #ccc',
-                borderRadius: '8px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                fontSize: window.innerWidth <= 480 ? '12px' : '14px'
+                backgroundColor: colors.tooltip,
+                border: `1px solid ${colors.tooltipBorder}`,
+                borderRadius: '12px',
+                boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                fontSize: window.innerWidth <= 480 ? '12px' : '14px',
+                padding: '12px'
               }}
             />
             <Legend 
@@ -95,15 +117,15 @@ const SalesChart = ({ data, graphType = 'line' }) => {
             />
             <Bar 
               dataKey="historical" 
-              fill="#3498db" 
+              fill={colors.historical} 
               name="Historical Data"
-              radius={[4, 4, 0, 0]}
+              radius={[6, 6, 0, 0]}
             />
             <Bar 
               dataKey="forecasted" 
-              fill="#e74c3c" 
+              fill={colors.forecasted} 
               name="Forecasted Data"
-              radius={[4, 4, 0, 0]}
+              radius={[6, 6, 0, 0]}
             />
           </BarChart>
         );
@@ -111,25 +133,26 @@ const SalesChart = ({ data, graphType = 'line' }) => {
       case 'area':
         return (
           <AreaChart {...commonProps}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+            <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
             <XAxis 
               dataKey="year" 
-              stroke="#666"
+              stroke={colors.text}
               fontSize={window.innerWidth <= 480 ? 10 : 12}
               tick={{ fontSize: window.innerWidth <= 480 ? 10 : 12 }}
             />
             <YAxis 
-              stroke="#666"
+              stroke={colors.text}
               fontSize={window.innerWidth <= 480 ? 10 : 12}
               tick={{ fontSize: window.innerWidth <= 480 ? 10 : 12 }}
             />
             <Tooltip 
               contentStyle={{
-                backgroundColor: 'white',
-                border: '1px solid #ccc',
-                borderRadius: '8px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                fontSize: window.innerWidth <= 480 ? '12px' : '14px'
+                backgroundColor: colors.tooltip,
+                border: `1px solid ${colors.tooltipBorder}`,
+                borderRadius: '12px',
+                boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                fontSize: window.innerWidth <= 480 ? '12px' : '14px',
+                padding: '12px'
               }}
             />
             <Legend 
@@ -141,17 +164,17 @@ const SalesChart = ({ data, graphType = 'line' }) => {
             <Area 
               type="monotone" 
               dataKey="historical" 
-              stroke="#3498db" 
-              fill="#3498db" 
-              fillOpacity={0.6}
+              stroke={colors.historical} 
+              fill={colors.historical} 
+              fillOpacity={0.7}
               name="Historical Data"
             />
             <Area 
               type="monotone" 
               dataKey="forecasted" 
-              stroke="#e74c3c" 
-              fill="#e74c3c" 
-              fillOpacity={0.6}
+              stroke={colors.forecasted} 
+              fill={colors.forecasted} 
+              fillOpacity={0.7}
               name="Forecasted Data"
             />
           </AreaChart>
@@ -160,25 +183,26 @@ const SalesChart = ({ data, graphType = 'line' }) => {
       default:
         return (
           <LineChart {...commonProps}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+            <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
             <XAxis 
               dataKey="year" 
-              stroke="#666"
+              stroke={colors.text}
               fontSize={window.innerWidth <= 480 ? 10 : 12}
               tick={{ fontSize: window.innerWidth <= 480 ? 10 : 12 }}
             />
             <YAxis 
-              stroke="#666"
+              stroke={colors.text}
               fontSize={window.innerWidth <= 480 ? 10 : 12}
               tick={{ fontSize: window.innerWidth <= 480 ? 10 : 12 }}
             />
             <Tooltip 
               contentStyle={{
-                backgroundColor: 'white',
-                border: '1px solid #ccc',
-                borderRadius: '8px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                fontSize: window.innerWidth <= 480 ? '12px' : '14px'
+                backgroundColor: colors.tooltip,
+                border: `1px solid ${colors.tooltipBorder}`,
+                borderRadius: '12px',
+                boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                fontSize: window.innerWidth <= 480 ? '12px' : '14px',
+                padding: '12px'
               }}
             />
             <Legend 
@@ -190,20 +214,30 @@ const SalesChart = ({ data, graphType = 'line' }) => {
             <Line 
               type="monotone" 
               dataKey="historical" 
-              stroke="#3498db" 
-              strokeWidth={window.innerWidth <= 768 ? 2 : 3}
+              stroke={colors.historical} 
+              strokeWidth={window.innerWidth <= 768 ? 3 : 4}
               name="Historical Data"
-              dot={{ fill: '#3498db', strokeWidth: 2, r: window.innerWidth <= 768 ? 4 : 6 }}
+              dot={{ 
+                fill: colors.historical, 
+                strokeWidth: 2, 
+                r: window.innerWidth <= 768 ? 5 : 7,
+                stroke: '#ffffff'
+              }}
               connectNulls={false}
             />
             <Line 
               type="monotone" 
               dataKey="forecasted" 
-              stroke="#e74c3c" 
-              strokeWidth={window.innerWidth <= 768 ? 2 : 3}
+              stroke={colors.forecasted} 
+              strokeWidth={window.innerWidth <= 768 ? 3 : 4}
               strokeDasharray="5 5"
               name="Forecasted Data"
-              dot={{ fill: '#e74c3c', strokeWidth: 2, r: window.innerWidth <= 768 ? 4 : 6 }}
+              dot={{ 
+                fill: colors.forecasted, 
+                strokeWidth: 2, 
+                r: window.innerWidth <= 768 ? 5 : 7,
+                stroke: '#ffffff'
+              }}
               connectNulls={false}
             />
           </LineChart>
@@ -216,8 +250,11 @@ const SalesChart = ({ data, graphType = 'line' }) => {
       <div style={{ 
         textAlign: 'center', 
         padding: window.innerWidth <= 768 ? '20px' : '40px',
-        color: '#666',
-        fontSize: window.innerWidth <= 480 ? '1rem' : '1.1rem'
+        color: '#64748b',
+        fontSize: window.innerWidth <= 480 ? '1rem' : '1.1rem',
+        background: '#f8fafc',
+        borderRadius: '12px',
+        border: '2px dashed #cbd5e1'
       }}>
         📊 No data available for chart
       </div>
@@ -227,12 +264,7 @@ const SalesChart = ({ data, graphType = 'line' }) => {
   return (
     <div>
       <h3 className="section-title">📈 Sales Forecast Chart</h3>
-      <div style={{ 
-        background: 'white', 
-        borderRadius: '10px', 
-        padding: window.innerWidth <= 768 ? '15px' : '20px',
-        boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)'
-      }}>
+      <div className="chart-container">
         <ResponsiveContainer width="100%" height={window.innerWidth <= 768 ? 300 : 400}>
           {renderChart()}
         </ResponsiveContainer>

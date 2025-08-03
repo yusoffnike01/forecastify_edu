@@ -75,20 +75,22 @@ export const calculateStatistics = (historicalData, forecastedData) => {
   
   // Calculate average growth rate from historical data
   let averageGrowthRate = 0;
+  let growthRates = [];
   if (historicalData.length > 1) {
-    const growthRates = [];
     for (let i = 1; i < historicalData.length; i++) {
       const growth = ((historicalData[i].sales - historicalData[i-1].sales) / historicalData[i-1].sales) * 100;
-      growthRates.push(growth);
+      growthRates.push(growth.toFixed(2));
     }
-    averageGrowthRate = growthRates.reduce((sum, rate) => sum + rate, 0) / growthRates.length;
+    averageGrowthRate = growthRates.reduce((sum, rate) => sum + parseFloat(rate), 0) / growthRates.length;
   }
 
   // Calculate projected growth from forecasted data
   let projectedGrowth = 0;
+  let lastHistorical = 0;
+  let firstForecasted = 0;
   if (forecastedData.length > 0 && historicalData.length > 0) {
-    const lastHistorical = historicalData[historicalData.length - 1].sales;
-    const firstForecasted = forecastedData[0].sales;
+    lastHistorical = historicalData[historicalData.length - 1].sales;
+    firstForecasted = forecastedData[0].sales;
     projectedGrowth = ((firstForecasted - lastHistorical) / lastHistorical) * 100;
   }
 
@@ -96,7 +98,10 @@ export const calculateStatistics = (historicalData, forecastedData) => {
     totalHistorical,
     totalForecasted,
     averageGrowthRate,
-    projectedGrowth
+    projectedGrowth,
+    growthRates,
+    lastHistorical,
+    firstForecasted
   };
 };
 
@@ -105,8 +110,8 @@ export const validateData = (historicalData, parameters) => {
   const errors = [];
 
   // Check historical data
-  if (!historicalData || historicalData.length < 5) {
-    errors.push("Historical data must have at least 5 years");
+  if (!historicalData || historicalData.length < 3) {
+    errors.push("Historical data must have at least 3 years");
   }
 
   if (historicalData) {
@@ -136,5 +141,9 @@ export const validateData = (historicalData, parameters) => {
     });
   }
 
-  return errors;
+  return {
+    isValid: errors.length === 0,
+    message: errors.length > 0 ? errors.join(', ') : '',
+    errors: errors
+  };
 }; 
