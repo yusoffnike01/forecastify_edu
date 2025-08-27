@@ -68,20 +68,16 @@ const LandingPage = ({ onNavigateToCalculation }) => {
           }}>
             {/* Logo */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{ 
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                color: 'white',
-                width: '40px',
-                height: '40px',
-                borderRadius: '12px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '20px',
-                fontWeight: 'bold'
-              }}>
-                F
-              </div>
+              <img 
+                src="/images/logoforecastifyedu.jpeg" 
+                alt="Forecastify EDU Logo"
+                style={{ 
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '8px',
+                  objectFit: 'contain'
+                }}
+              />
               <div>
                 <h1 style={{ fontSize: '22px', fontWeight: '700', margin: 0, color: '#1a202c' }}>
                   Forecastify
@@ -934,20 +930,16 @@ const LandingPage = ({ onNavigateToCalculation }) => {
             }}>
               {/* Logo and Info */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ 
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  color: 'white',
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '8px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '16px',
-                  fontWeight: 'bold'
-                }}>
-                  F
-                </div>
+                <img 
+                  src="/images/logoforecastifyedu.jpeg" 
+                  alt="Forecastify EDU Logo"
+                  style={{ 
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '6px',
+                    objectFit: 'contain'
+                  }}
+                />
                 <h3 style={{ fontSize: '1.2rem', fontWeight: '600', margin: 0 }}>
                   Forecastify
                 </h3>
@@ -994,7 +986,7 @@ const LandingPage = ({ onNavigateToCalculation }) => {
             }}>
               <div>
                 <p style={{ opacity: 0.7, margin: 0, fontSize: '13px', marginBottom: '2px' }}>
-                  © 2024 Forecastify. All rights reserved.
+                  © {new Date().getFullYear()} Forecastify. All rights reserved.
                 </p>
                 <p style={{ opacity: 0.6, margin: 0, fontSize: '12px' }}>
                   Developed by Politeknik Tuanku Sultanah Bahiyah
@@ -1062,21 +1054,17 @@ const LandingPage = ({ onNavigateToCalculation }) => {
               }}
             >
               <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-                <div style={{
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  color: 'white',
-                  width: '60px',
-                  height: '60px',
-                  borderRadius: '20px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '24px',
-                  fontWeight: 'bold',
-                  margin: '0 auto 1.5rem'
-                }}>
-                  F
-                </div>
+                <img 
+                  src="/images/logoforecastifyedu.jpeg" 
+                  alt="Forecastify EDU Logo"
+                  style={{ 
+                    width: '60px',
+                    height: '60px',
+                    borderRadius: '12px',
+                    objectFit: 'contain',
+                    margin: '0 auto 1.5rem'
+                  }}
+                />
                 <h2 style={{ 
                   fontSize: '2rem', 
                   fontWeight: '700', 
