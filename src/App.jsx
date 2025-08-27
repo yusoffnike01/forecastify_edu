@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LandingPage from './components/LandingPage';
 import CalculationPage from './components/Calculation/CalculationPage';
+import { TypingText, FadeUpText } from './components/AnimatedText';
 import './App.css';
 
 function App() {
@@ -10,33 +11,79 @@ function App() {
 
   return (
     <div className="app">
-      {/* Header */}
-      <motion.header 
-        className="app-header"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="header-content">
-          <div className="header-left">
-            <h1 className="app-title">FORECASTIFY EDU</h1>
-            <p className="app-subtitle">Educational Sales Forecasting System</p>
-          </div>
-          <div className="header-right">
-            {currentPage === 'calculation' && (
+      {/* Header - Only show on calculation page */}
+      {currentPage === 'calculation' && (
+        <motion.header 
+          className="app-header"
+          initial={{ opacity: 0, y: -30, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+        >
+          <div className="header-content">
+            <div className="header-left">
+              <TypingText 
+                text="FORECASTIFY EDU" 
+                className="app-title"
+                style={{ 
+                  fontSize: '1.8rem', 
+                  fontWeight: '700',
+                  color: '#ffffff',
+                  marginBottom: '4px'
+                }}
+              />
+              <FadeUpText 
+                text="Educational Supply Chain Forecasting System" 
+                className="app-subtitle"
+                delay={1.2}
+                style={{
+                  fontSize: '0.9rem',
+                  color: '#e3f2fd',
+                  opacity: 0.9
+                }}
+              />
+            </div>
+            <div className="header-right">
               <motion.button
                 className="back-button"
                 onClick={() => setCurrentPage('home')}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 1.5, duration: 0.5 }}
+                whileHover={{ 
+                  scale: 1.05, 
+                  boxShadow: "0 8px 25px rgba(255,255,255,0.2)",
+                  backgroundColor: "rgba(255,255,255,0.15)"
+                }}
+                whileTap={{ scale: 0.95 }}
+                style={{
+                  background: 'rgba(255,255,255,0.1)',
+                  backdropFilter: 'blur(10px)',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  borderRadius: '12px',
+                  padding: '10px 20px',
+                  color: '#ffffff',
+                  fontSize: '0.9rem',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  transition: 'all 0.3s ease'
+                }}
               >
-                <span className="arrow">←</span>
+                <motion.span 
+                  className="arrow"
+                  animate={{ x: [-2, 0, -2] }}
+                  transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                >
+                  ←
+                </motion.span>
                 Back to Home
               </motion.button>
-            )}
+            </div>
           </div>
-        </div>
-      </motion.header>
+        </motion.header>
+      )}
 
       {/* Main Content */}
       <main className="main-content">
