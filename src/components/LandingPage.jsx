@@ -742,7 +742,6 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                   }}
                 >
                   <div style={{ 
-                    fontSize: '4rem',
                     marginBottom: '1.5rem',
                     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                     width: '80px',

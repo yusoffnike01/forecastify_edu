@@ -7,7 +7,6 @@ import ForecastingParameters from '../DataInput/ForecastingParameters';
 import SalesChart from '../GraphVisualization/SalesChart';
 import ResultsDisplay from '../EducationalDisplay/ResultsDisplay';
 import { calculateForecast, combineDataForGraph, calculateStatistics, validateData } from '../../utils/calculations';
-import { logButtonClick } from '../../firebase/analytics';
 
 const CalculationPage = () => {
   // State management for calculation data
@@ -34,9 +33,6 @@ const CalculationPage = () => {
   const handleCalculate = async () => {
     setIsCalculating(true);
     setError('');
-    
-    // Log calculation event
-    logButtonClick('calculate_forecast', 'calculation_page');
     
     try {
       // Debug logging
