@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AnimatedText, { TypingText, FadeUpText, ScaleInText } from './AnimatedText';
-import { signInWithEmail, signInWithGoogle } from '../firebase/auth';
+import { signInWithEmail, signInWithGoogle, signOutUser } from '../firebase/auth';
 import { useAuth } from '../contexts/AuthContext';
 
 const LandingPage = ({ onNavigateToCalculation }) => {
@@ -154,25 +154,57 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                 About
               </a>
               
-              <motion.button
-                onClick={() => setShowSignInModal(true)}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                style={{
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  color: 'white',
-                  border: 'none',
-                  padding: '12px 24px',
-                  borderRadius: '12px',
-                  fontWeight: '600',
-                  fontSize: '14px',
-                  cursor: 'pointer',
-                  boxShadow: '0 4px 20px rgba(102, 126, 234, 0.25)',
-                  marginLeft: '1rem'
-                }}
-              >
-                Sign In
-              </motion.button>
+              {currentUser ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginLeft: '1rem' }}>
+                  <div style={{
+                    padding: '8px 16px',
+                    background: 'rgba(102, 126, 234, 0.1)',
+                    borderRadius: '20px',
+                    fontSize: '14px',
+                    color: '#667eea',
+                    fontWeight: '500'
+                  }}>
+                    👋 {userData?.displayName || currentUser.email}
+                  </div>
+                  <motion.button
+                    onClick={async () => await signOutUser()}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    style={{
+                      background: 'rgba(239, 68, 68, 0.1)',
+                      color: '#dc2626',
+                      border: '1px solid rgba(239, 68, 68, 0.2)',
+                      padding: '8px 16px',
+                      borderRadius: '8px',
+                      fontWeight: '500',
+                      fontSize: '14px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Logout
+                  </motion.button>
+                </div>
+              ) : (
+                <motion.button
+                  onClick={() => setShowSignInModal(true)}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  style={{
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    color: 'white',
+                    border: 'none',
+                    padding: '12px 24px',
+                    borderRadius: '12px',
+                    fontWeight: '600',
+                    fontSize: '14px',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 20px rgba(102, 126, 234, 0.25)',
+                    marginLeft: '1rem'
+                  }}
+                >
+                  Sign In
+                </motion.button>
+              )}
             </nav>
 
             {/* Mobile Menu Button */}
@@ -1165,6 +1197,21 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                     onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
                   />
                 </div>
+
+                {/* Error Message */}
+                {authError && (
+                  <div style={{
+                    background: 'rgba(239, 68, 68, 0.1)',
+                    color: '#dc2626',
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    marginBottom: '1rem',
+                    border: '1px solid rgba(239, 68, 68, 0.2)'
+                  }}>
+                    {authError}
+                  </div>
+                )}
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                   <motion.button

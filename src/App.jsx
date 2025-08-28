@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LandingPage from './components/LandingPage';
 import CalculationPage from './components/Calculation/CalculationPage';
+import ProtectedRoute from './components/ProtectedRoute';
+import SessionTimer from './components/SessionTimer';
 import { TypingText, FadeUpText } from './components/AnimatedText';
 import { AuthProvider } from './contexts/AuthContext';
 import './App.css';
@@ -96,10 +98,15 @@ function App() {
               onNavigateToCalculation={() => setCurrentPage('calculation')}
             />
           ) : (
-            <CalculationPage key="calculation" />
+            <ProtectedRoute>
+              <CalculationPage key="calculation" />
+            </ProtectedRoute>
           )}
         </AnimatePresence>
       </main>
+
+      {/* Session Timer - Only show when on calculation page */}
+      {currentPage === 'calculation' && <SessionTimer />}
 
       </div>
     </AuthProvider>
