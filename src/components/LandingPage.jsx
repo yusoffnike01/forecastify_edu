@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AnimatedText, { TypingText, FadeUpText, ScaleInText } from './AnimatedText';
+import { signInWithEmail, signInWithGoogle } from '../firebase/auth';
+import { useAuth } from '../contexts/AuthContext';
 
 const LandingPage = ({ onNavigateToCalculation }) => {
   const [showSignInModal, setShowSignInModal] = useState(false);
@@ -8,16 +10,51 @@ const LandingPage = ({ onNavigateToCalculation }) => {
   const [password, setPassword] = useState('');
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [authError, setAuthError] = useState('');
+  
+  const { currentUser, userData } = useAuth();
 
   const handleSignIn = async (e) => {
     e.preventDefault();
     setIsSigningIn(true);
+    setAuthError('');
     
-    setTimeout(() => {
+    try {
+      const result = await signInWithEmail(email, password);
+      
+      if (result.success) {
+        setShowSignInModal(false);
+        setEmail('');
+        setPassword('');
+        // Optional: Show success message or redirect
+      } else {
+        setAuthError(result.error);
+      }
+    } catch (error) {
+      setAuthError('An unexpected error occurred. Please try again.');
+    } finally {
       setIsSigningIn(false);
-      setShowSignInModal(false);
-      alert('Sign in successful! (Demo)');
-    }, 2000);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setIsSigningIn(true);
+    setAuthError('');
+    
+    try {
+      const result = await signInWithGoogle();
+      
+      if (result.success) {
+        setShowSignInModal(false);
+        // Optional: Show success message or redirect
+      } else {
+        setAuthError(result.error);
+      }
+    } catch (error) {
+      setAuthError('An unexpected error occurred. Please try again.');
+    } finally {
+      setIsSigningIn(false);
+    }
   };
 
   const containerVariants = {

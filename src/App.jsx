@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import LandingPage from './components/LandingPage';
 import CalculationPage from './components/Calculation/CalculationPage';
 import { TypingText, FadeUpText } from './components/AnimatedText';
+import { AuthProvider } from './contexts/AuthContext';
 import './App.css';
 
 function App() {
@@ -10,7 +11,8 @@ function App() {
 
 
   return (
-    <div className="app">
+    <AuthProvider>
+      <div className="app">
       {/* Header - Only show on calculation page */}
       {currentPage === 'calculation' && (
         <motion.header 
@@ -99,7 +101,8 @@ function App() {
         </AnimatePresence>
       </main>
 
-    </div>
+      </div>
+    </AuthProvider>
   );
 }
 
