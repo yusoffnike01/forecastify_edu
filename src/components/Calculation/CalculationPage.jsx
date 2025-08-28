@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -368,155 +368,319 @@ const CalculationPage = () => {
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      width: '100%',
-      background: 'var(--bg-primary)',
-      position: 'relative'
-    }}>
+    <>
+      <div style={{
+        minHeight: '100vh',
+        width: '100%',
+        background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+        position: 'relative'
+      }}>
+      
+      {/* Background Pattern */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        opacity: 0.03,
+        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23667eea' fill-opacity='1'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+        backgroundSize: '60px 60px'
+      }} />
       
       {/* Content Container */}
       <div style={{
         position: 'relative',
         zIndex: 1,
-        padding: 'var(--space-6)',
+        padding: '2rem',
         width: '100%',
-        margin: '0'
+        maxWidth: '1400px',
+        margin: '0 auto'
       }}>
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
+          initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
           style={{
             textAlign: 'center',
-            marginBottom: 'var(--space-8)',
-            color: 'var(--text-primary)'
+            marginBottom: '3rem',
+            background: 'rgba(255, 255, 255, 0.9)',
+            backdropFilter: 'blur(20px)',
+            borderRadius: '24px',
+            padding: '2.5rem',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)'
           }}
         >
-          <h1 style={{
-            fontSize: '2.5rem',
-            fontWeight: '800',
-            marginBottom: 'var(--space-2)'
-          }}>
-            📊 Data Input
-          </h1>
-          <p style={{
-            fontSize: '1.1rem',
-            opacity: 0.9,
-            maxWidth: '600px',
-            margin: '0 auto',
-            color: 'var(--text-secondary)'
-          }}>
-            Enter your historical sales data and forecasting parameters
-          </p>
+          <motion.div
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ delay: 0.3, duration: 0.6, type: "spring" }}
+            style={{ 
+              fontSize: '4rem', 
+              marginBottom: '1rem',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              display: 'inline-block'
+            }}
+          >
+            📊
+          </motion.div>
+          <motion.h1
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            style={{
+              fontSize: 'clamp(2.5rem, 5vw, 3.5rem)',
+              fontWeight: '800',
+              marginBottom: '1rem',
+              background: 'linear-gradient(135deg, #1a202c 0%, #4a5568 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              lineHeight: '1.2'
+            }}
+          >
+            Data Input
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.7 }}
+            style={{
+              fontSize: '1.2rem',
+              color: '#4a5568',
+              maxWidth: '700px',
+              margin: '0 auto',
+              lineHeight: '1.6'
+            }}
+          >
+            Enter your historical sales data and forecasting parameters to generate accurate supply chain predictions
+          </motion.p>
         </motion.div>
 
         {/* Main Content */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: '1fr',
-          gap: 'var(--space-6)'
+          gridTemplateColumns: 'repeat(auto-fit, minmax(600px, 1fr))',
+          gap: '2rem',
+          marginBottom: '3rem'
         }}>
           
-          {/* Input Cards */}
+          {/* Historical Data Card */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.9, duration: 0.8 }}
+            whileHover={{ y: -8, scale: 1.02 }}
             style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr',
-              gap: 'var(--space-6)',
-              marginBottom: 'var(--space-8)'
+              background: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(20px)',
+              borderRadius: '24px',
+              padding: '2rem',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              transition: 'all 0.3s ease'
             }}
           >
-            {/* Historical Data Card */}
             <motion.div
-              whileHover={{ y: -5 }}
-              style={{
-                background: 'var(--bg-card)',
-                borderRadius: 'var(--radius-lg)',
-                padding: 'var(--space-6)',
-                boxShadow: 'var(--shadow-md)',
-                border: '1px solid var(--border-color)'
-              }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.1 }}
+              style={{ marginBottom: '1.5rem' }}
             >
-              <HistoricalDataTable 
-                data={historicalData}
-                onDataChange={setHistoricalData}
-              />
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                marginBottom: '8px'
+              }}>
+                <div style={{
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  color: 'white',
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '20px'
+                }}>
+                  📈
+                </div>
+                <div>
+                  <h3 style={{
+                    fontSize: '1.5rem',
+                    fontWeight: '700',
+                    color: '#1a202c',
+                    margin: 0
+                  }}>
+                    Historical Sales Data
+                  </h3>
+                  <p style={{
+                    fontSize: '0.9rem',
+                    color: '#4a5568',
+                    margin: 0
+                  }}>
+                    Past performance data for analysis
+                  </p>
+                </div>
+              </div>
             </motion.div>
-
-            {/* Forecasting Parameters Card */}
-            <motion.div
-              whileHover={{ y: -5 }}
-              style={{
-                background: 'var(--bg-card)',
-                borderRadius: 'var(--radius-lg)',
-                padding: 'var(--space-6)',
-                boxShadow: 'var(--shadow-md)',
-                border: '1px solid var(--border-color)'
-              }}
-            >
-              <ForecastingParameters 
-                parameters={forecastParameters}
-                onParametersChange={setForecastParameters}
-              />
-            </motion.div>
+            <HistoricalDataTable 
+              data={historicalData}
+              onDataChange={setHistoricalData}
+            />
           </motion.div>
 
-          {/* Action Center */}
+          {/* Forecasting Parameters Card */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 1.1, duration: 0.8 }}
+            whileHover={{ y: -8, scale: 1.02 }}
             style={{
-              background: 'var(--bg-card)',
-              borderRadius: 'var(--radius-lg)',
-              padding: 'var(--space-6)',
-              boxShadow: 'var(--shadow-md)',
-              border: '1px solid var(--border-color)',
-              marginBottom: 'var(--space-8)',
-              textAlign: 'center'
+              background: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(20px)',
+              borderRadius: '24px',
+              padding: '2rem',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              transition: 'all 0.3s ease'
             }}
+          >
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.3 }}
+              style={{ marginBottom: '1.5rem' }}
+            >
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                marginBottom: '8px'
+              }}>
+                <div style={{
+                  background: 'linear-gradient(135deg, #764ba2 0%, #667eea 100%)',
+                  color: 'white',
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '20px'
+                }}>
+                  🎯
+                </div>
+                <div>
+                  <h3 style={{
+                    fontSize: '1.5rem',
+                    fontWeight: '700',
+                    color: '#1a202c',
+                    margin: 0
+                  }}>
+                    Forecasting Parameters
+                  </h3>
+                  <p style={{
+                    fontSize: '0.9rem',
+                    color: '#4a5568',
+                    margin: 0
+                  }}>
+                    Future growth predictions & targets
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+            <ForecastingParameters 
+              parameters={forecastParameters}
+              onParametersChange={setForecastParameters}
+            />
+          </motion.div>
+        </div>
+
+        {/* Action Center */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.5, duration: 0.8 }}
+          style={{
+            background: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(20px)',
+            borderRadius: '24px',
+            padding: '2.5rem',
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)',
+            border: '1px solid rgba(255, 255, 255, 0.3)',
+            marginBottom: '3rem',
+            textAlign: 'center'
+          }}
           >
             <div style={{
               display: 'flex',
-              gap: 'var(--space-4)',
+              gap: '1.5rem',
               justifyContent: 'center',
               alignItems: 'center',
               flexWrap: 'wrap',
-              marginBottom: 'var(--space-4)'
+              marginBottom: '1.5rem'
             }}>
               <motion.button
                 onClick={handleCalculate}
                 disabled={isCalculating}
-                whileHover={{ scale: isCalculating ? 1 : 1.05 }}
+                whileHover={{ scale: isCalculating ? 1 : 1.08, y: -2 }}
                 whileTap={{ scale: isCalculating ? 1 : 0.95 }}
-                className="btn btn-primary"
                 style={{
-                  fontSize: '1.1rem',
-                  padding: 'var(--space-4) var(--space-8)',
-                  fontWeight: '600',
-                  minWidth: '200px',
-                  borderRadius: '50px',
-                  opacity: isCalculating ? 0.6 : 1,
-                  cursor: isCalculating ? 'not-allowed' : 'pointer'
+                  background: isCalculating 
+                    ? 'linear-gradient(135deg, #a0aec0 0%, #718096 100%)'
+                    : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  color: 'white',
+                  border: 'none',
+                  fontSize: '1.2rem',
+                  padding: '16px 32px',
+                  fontWeight: '700',
+                  minWidth: '220px',
+                  borderRadius: '16px',
+                  cursor: isCalculating ? 'not-allowed' : 'pointer',
+                  boxShadow: isCalculating 
+                    ? 'none'
+                    : '0 10px 30px rgba(102, 126, 234, 0.4)',
+                  transition: 'all 0.3s ease',
+                  position: 'relative',
+                  overflow: 'hidden'
                 }}
               >
-                {isCalculating ? '🔄 Calculating...' : '🚀 Calculate Forecast'}
+                <span style={{ position: 'relative', zIndex: 2 }}>
+                  {isCalculating ? '🔄 Calculating...' : '🚀 Calculate Forecast'}
+                </span>
+                {!isCalculating && (
+                  <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: '-100%',
+                    width: '100%',
+                    height: '100%',
+                    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+                    transition: 'left 0.5s ease'
+                  }} />
+                )}
               </motion.button>
 
               <motion.button
                 onClick={handleReset}
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
-                className="btn btn-outline"
                 style={{
-                  padding: 'var(--space-4) var(--space-6)',
-                  borderRadius: '50px',
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  color: '#4a5568',
+                  border: '2px solid #e2e8f0',
+                  padding: '14px 24px',
+                  borderRadius: '16px',
                   fontSize: '1rem',
-                  fontWeight: '600'
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  backdropFilter: 'blur(10px)'
                 }}
               >
                 🔄 Reset Data
@@ -751,11 +915,10 @@ const CalculationPage = () => {
             </motion.div>
           )}
         </div>
-      </div>
 
-      {/* Export Confirmation Modal */}
-      <AnimatePresence>
-        {showExportModal && (
+        {/* Export Confirmation Modal */}
+        <AnimatePresence>
+          {showExportModal && (
           <motion.div
             className="modal-overlay"
             initial={{ opacity: 0 }}
@@ -883,9 +1046,10 @@ const CalculationPage = () => {
               </div>
             </motion.div>
           </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+          )}
+        </AnimatePresence>
+      </div>
+    </>
   );
 };
 

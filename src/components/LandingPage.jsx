@@ -170,36 +170,35 @@ const LandingPage = ({ onNavigateToCalculation }) => {
         >
           <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 2rem' }}>
             
-            {/* Badge */}
-            <ScaleInText
-              text=""
-              delay={0}
+
+            {/* Logo Section */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ delay: 0.8, duration: 0.8, type: "spring", stiffness: 100 }}
               style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                background: 'rgba(102, 126, 234, 0.1)',
-                border: '1px solid rgba(102, 126, 234, 0.2)',
-                borderRadius: '50px',
-                padding: '8px 20px',
-                marginBottom: '2rem',
-                fontSize: '14px',
-                fontWeight: '500',
-                color: '#667eea'
+                display: 'flex',
+                justifyContent: 'center',
+                marginBottom: '2rem'
               }}
             >
-              <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.2, duration: 0.5, type: "spring" }}
-              >
-                🎉
-              </motion.span>
-              <TypingText 
-                text="New: Supply Chain Forecasting Available"
-                style={{ marginLeft: '4px' }}
+              <motion.img
+                src="/images/logoforecastifyedu.jpeg"
+                alt="Forecastify EDU - Educational Supply Chain Forecasting"
+                whileHover={{ scale: 1.05, rotate: [0, -2, 2, 0] }}
+                transition={{ duration: 0.3 }}
+                style={{
+                  width: '120px',
+                  height: '120px',
+                  borderRadius: '24px',
+                  objectFit: 'contain',
+                  boxShadow: '0 20px 60px rgba(102, 126, 234, 0.3)',
+                  border: '4px solid rgba(255, 255, 255, 0.8)',
+                  background: 'rgba(255, 255, 255, 0.9)',
+                  backdropFilter: 'blur(10px)'
+                }}
               />
-            </ScaleInText>
+            </motion.div>
 
             <div style={{ marginBottom: '1.5rem' }}>
               <AnimatedText
@@ -466,11 +465,6 @@ const LandingPage = ({ onNavigateToCalculation }) => {
             }}>
               {[
                 {
-                  icon: '🤖',
-                  title: 'AI-Powered Predictions',
-                  description: 'Advanced machine learning algorithms that learn from your data patterns to provide accurate forecasts.'
-                },
-                {
                   icon: '📊',
                   title: 'Beautiful Visualizations',
                   description: 'Interactive charts and graphs that make complex data easy to understand and share.'
@@ -489,11 +483,6 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                   icon: '📱',
                   title: 'Works Everywhere',
                   description: 'Access your forecasts on any device. Fully responsive and optimized experience.'
-                },
-                {
-                  icon: '🔐',
-                  title: 'Enterprise Security',
-                  description: 'Your data is protected with enterprise-grade security and privacy controls.'
                 }
               ].map((feature, index) => (
                 <motion.div
@@ -1185,17 +1174,6 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                   </motion.button>
                 </div>
 
-                <div style={{ 
-                  textAlign: 'center', 
-                  marginTop: '2rem',
-                  fontSize: '14px',
-                  color: '#4a5568'
-                }}>
-                  Don't have an account?{' '}
-                  <a href="#" style={{ color: '#667eea', textDecoration: 'none', fontWeight: '600' }}>
-                    Sign up
-                  </a>
-                </div>
               </form>
             </motion.div>
           </motion.div>
