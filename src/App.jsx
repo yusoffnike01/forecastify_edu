@@ -6,6 +6,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import SessionTimer from './components/SessionTimer';
 import { TypingText, FadeUpText } from './components/AnimatedText';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { signOutUser } from './firebase/auth';
 import './App.css';
 
 function AppContent() {
@@ -21,6 +22,15 @@ function AppContent() {
     }
   }, [currentUser]);
 
+  const handleLogout = async () => {
+    try {
+      await signOutUser();
+      setCurrentPage('home');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
 
   return (
       <div className="app">
@@ -31,37 +41,159 @@ function AppContent() {
           initial={{ opacity: 0, y: -30, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.7, ease: "easeOut" }}
+          style={{
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            backdropFilter: 'blur(20px)',
+            borderRadius: '0 0 24px 24px',
+            padding: '1rem 2rem',
+            boxShadow: '0 10px 40px rgba(102, 126, 234, 0.3)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            position: 'sticky',
+            top: 0,
+            zIndex: 100
+          }}
         >
-          <div className="header-content">
-            <div className="header-left">
-              <TypingText 
-                text="FORECASTIFY EDU" 
-                className="app-title"
-                style={{ 
-                  fontSize: '1.8rem', 
-                  fontWeight: '700',
-                  color: '#ffffff',
-                  marginBottom: '4px'
-                }}
-              />
-              <FadeUpText 
-                text="Educational Supply Chain Forecasting System" 
-                className="app-subtitle"
-                delay={1.2}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            maxWidth: '1400px',
+            margin: '0 auto',
+            width: '100%'
+          }}>
+            {/* Logo and Brand */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <motion.img
+                src="/images/logoforecastifyedu.jpeg"
+                alt="Forecastify EDU"
+                initial={{ opacity: 0, rotate: -10 }}
+                animate={{ opacity: 1, rotate: 0 }}
+                transition={{ delay: 0.3, duration: 0.6 }}
                 style={{
-                  fontSize: '0.9rem',
-                  color: '#e3f2fd',
-                  opacity: 0.9
+                  width: '50px',
+                  height: '50px',
+                  borderRadius: '12px',
+                  objectFit: 'contain',
+                  boxShadow: '0 8px 25px rgba(255, 255, 255, 0.2)'
                 }}
               />
+              <div>
+                <TypingText 
+                  text="FORECASTIFY EDU" 
+                  className="app-title"
+                  style={{ 
+                    fontSize: '1.5rem', 
+                    fontWeight: '700',
+                    color: '#ffffff',
+                    marginBottom: '2px'
+                  }}
+                />
+                <FadeUpText 
+                  text="Educational Supply Chain Forecasting System" 
+                  className="app-subtitle"
+                  delay={1.2}
+                  style={{
+                    fontSize: '0.8rem',
+                    color: '#e3f2fd',
+                    opacity: 0.9
+                  }}
+                />
+              </div>
             </div>
-            <div className="header-right">
+
+            {/* Navigation Menu */}
+            <nav style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+              <motion.a
+                href="#dashboard"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.5 }}
+                whileHover={{ scale: 1.05, color: '#f1f5f9' }}
+                style={{
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  textDecoration: 'none',
+                  fontWeight: '500',
+                  fontSize: '0.95rem',
+                  padding: '8px 16px',
+                  borderRadius: '8px',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                Dashboard
+              </motion.a>
+              
+              <motion.a
+                href="#analytics"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6, duration: 0.5 }}
+                whileHover={{ scale: 1.05, color: '#f1f5f9' }}
+                style={{
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  textDecoration: 'none',
+                  fontWeight: '500',
+                  fontSize: '0.95rem',
+                  padding: '8px 16px',
+                  borderRadius: '8px',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                Analytics
+              </motion.a>
+
+              <motion.a
+                href="#reports"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7, duration: 0.5 }}
+                whileHover={{ scale: 1.05, color: '#f1f5f9' }}
+                style={{
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  textDecoration: 'none',
+                  fontWeight: '500',
+                  fontSize: '0.95rem',
+                  padding: '8px 16px',
+                  borderRadius: '8px',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                Reports
+              </motion.a>
+
+              <motion.a
+                href="#help"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8, duration: 0.5 }}
+                whileHover={{ scale: 1.05, color: '#f1f5f9' }}
+                style={{
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  textDecoration: 'none',
+                  fontWeight: '500',
+                  fontSize: '0.95rem',
+                  padding: '8px 16px',
+                  borderRadius: '8px',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                Help
+              </motion.a>
+
+              {/* Divider */}
+              <div style={{
+                width: '1px',
+                height: '30px',
+                background: 'rgba(255, 255, 255, 0.3)',
+                margin: '0 8px'
+              }} />
+
+              {/* Logout Button */}
               <motion.button
-                className="back-button"
-                onClick={() => setCurrentPage('home')}
+                className="logout-button"
+                onClick={handleLogout}
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 1.5, duration: 0.5 }}
+                transition={{ delay: 1.0, duration: 0.5 }}
                 whileHover={{ 
                   scale: 1.05, 
                   boxShadow: "0 8px 25px rgba(255,255,255,0.2)",
@@ -85,15 +217,15 @@ function AppContent() {
                 }}
               >
                 <motion.span 
-                  className="arrow"
-                  animate={{ x: [-2, 0, -2] }}
+                  className="logout-icon"
+                  animate={{ x: [-1, 0, -1] }}
                   transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
                 >
-                  ←
+                  🚪
                 </motion.span>
-                Back to Home
+                Logout
               </motion.button>
-            </div>
+            </nav>
           </div>
         </motion.header>
       )}

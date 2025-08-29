@@ -764,6 +764,23 @@ body {
   .mobile-menu-btn {
     display: block !important;
   }
+  
+  /* Header navigation responsive */
+  .app-header nav {
+    flex-wrap: wrap;
+    gap: 1rem !important;
+  }
+  
+  .app-header nav > a {
+    font-size: 0.85rem !important;
+    padding: 6px 12px !important;
+  }
+  
+  .app-header .logout-button {
+    padding: 8px 16px !important;
+    font-size: 0.85rem !important;
+  }
+  
   .app-container {
     padding: var(--space-2);
   }
