@@ -2,84 +2,89 @@ import { useState, useEffect, useCallback } from 'react';
 import { signOutUser } from '../firebase/auth';
 
 const SESSION_DURATION = 30 * 60 * 1000; // 30 minutes in milliseconds
+const SESSION_START_KEY = 'forecastify_session_start';
 
 export const useSessionTimeout = (user) => {
   const [timeLeft, setTimeLeft] = useState(SESSION_DURATION);
   const [isActive, setIsActive] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
 
-  const resetTimer = useCallback(() => {
+  const startNewSession = useCallback(() => {
+    const now = Date.now();
+    localStorage.setItem(SESSION_START_KEY, now.toString());
     setTimeLeft(SESSION_DURATION);
     setShowWarning(false);
   }, []);
 
   const handleLogout = useCallback(async () => {
     await signOutUser();
+    localStorage.removeItem(SESSION_START_KEY);
     setIsActive(false);
     setTimeLeft(SESSION_DURATION);
     setShowWarning(false);
   }, []);
 
+  const calculateTimeLeft = useCallback(() => {
+    const sessionStart = localStorage.getItem(SESSION_START_KEY);
+    if (!sessionStart) return SESSION_DURATION;
+    
+    const elapsed = Date.now() - parseInt(sessionStart);
+    const remaining = SESSION_DURATION - elapsed;
+    
+    return remaining > 0 ? remaining : 0;
+  }, []);
+
   useEffect(() => {
     if (user) {
       setIsActive(true);
-      resetTimer();
+      
+      // Check if there's an existing session
+      const existingSession = localStorage.getItem(SESSION_START_KEY);
+      if (existingSession) {
+        const remaining = calculateTimeLeft();
+        if (remaining <= 0) {
+          // Session expired, logout immediately
+          handleLogout();
+        } else {
+          setTimeLeft(remaining);
+        }
+      } else {
+        // Start new session
+        startNewSession();
+      }
     } else {
       setIsActive(false);
+      localStorage.removeItem(SESSION_START_KEY);
       setTimeLeft(SESSION_DURATION);
       setShowWarning(false);
     }
-  }, [user, resetTimer]);
+  }, [user, startNewSession, handleLogout, calculateTimeLeft]);
 
   useEffect(() => {
     let interval = null;
 
-    if (isActive && timeLeft > 0) {
+    if (isActive) {
       interval = setInterval(() => {
-        setTimeLeft(prevTime => {
-          const newTime = prevTime - 1000;
-          
-          // Show warning when 5 minutes left
-          if (newTime <= 5 * 60 * 1000 && newTime > 0) {
-            setShowWarning(true);
-          }
-          
-          // Auto logout when time expires
-          if (newTime <= 0) {
-            handleLogout();
-            return 0;
-          }
-          
-          return newTime;
-        });
+        const remaining = calculateTimeLeft();
+        
+        // Show warning when 5 minutes left
+        if (remaining <= 5 * 60 * 1000 && remaining > 0) {
+          setShowWarning(true);
+        }
+        
+        // Auto logout when time expires
+        if (remaining <= 0) {
+          handleLogout();
+        } else {
+          setTimeLeft(remaining);
+        }
       }, 1000);
     }
 
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isActive, timeLeft, handleLogout]);
-
-  // Reset timer on user activity
-  useEffect(() => {
-    const resetOnActivity = () => {
-      if (isActive) {
-        resetTimer();
-      }
-    };
-
-    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
-    
-    events.forEach(event => {
-      document.addEventListener(event, resetOnActivity, true);
-    });
-
-    return () => {
-      events.forEach(event => {
-        document.removeEventListener(event, resetOnActivity, true);
-      });
-    };
-  }, [isActive, resetTimer]);
+  }, [isActive, calculateTimeLeft, handleLogout]);
 
   const formatTime = (milliseconds) => {
     const totalSeconds = Math.floor(milliseconds / 1000);
@@ -92,7 +97,7 @@ export const useSessionTimeout = (user) => {
     timeLeft,
     formattedTime: formatTime(timeLeft),
     showWarning,
-    resetTimer,
+    resetTimer: startNewSession, // Renamed to allow manual session extension
     handleLogout
   };
 };

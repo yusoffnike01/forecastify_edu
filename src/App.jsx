@@ -1,19 +1,28 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LandingPage from './components/LandingPage';
 import CalculationPage from './components/Calculation/CalculationPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import SessionTimer from './components/SessionTimer';
 import { TypingText, FadeUpText } from './components/AnimatedText';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import './App.css';
 
-function App() {
-  const [currentPage, setCurrentPage] = useState('home'); // 'home' or 'calculation'
+function AppContent() {
+  const [currentPage, setCurrentPage] = useState('home');
+  const { currentUser } = useAuth();
+
+  // Auto-redirect authenticated users to calculation page
+  useEffect(() => {
+    if (currentUser) {
+      setCurrentPage('calculation');
+    } else {
+      setCurrentPage('home');
+    }
+  }, [currentUser]);
 
 
   return (
-    <AuthProvider>
       <div className="app">
       {/* Header - Only show on calculation page */}
       {currentPage === 'calculation' && (
@@ -98,9 +107,7 @@ function App() {
               onNavigateToCalculation={() => setCurrentPage('calculation')}
             />
           ) : (
-            <ProtectedRoute>
-              <CalculationPage key="calculation" />
-            </ProtectedRoute>
+            <CalculationPage key="calculation" />
           )}
         </AnimatePresence>
       </main>
@@ -109,6 +116,13 @@ function App() {
       {currentPage === 'calculation' && <SessionTimer />}
 
       </div>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
     </AuthProvider>
   );
 }
