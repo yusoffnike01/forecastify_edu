@@ -1,16 +1,20 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AnimatedText, { TypingText, FadeUpText, ScaleInText } from './AnimatedText';
-import { signInWithEmail, signInWithGoogle, signOutUser } from '../firebase/auth';
+import { signInWithEmail, signInWithGoogle, signOutUser, resetPassword } from '../firebase/auth';
 import { useAuth } from '../contexts/AuthContext';
 
 const LandingPage = ({ onNavigateToCalculation }) => {
   const [showSignInModal, setShowSignInModal] = useState(false);
+  const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [resetEmail, setResetEmail] = useState('');
   const [isSigningIn, setIsSigningIn] = useState(false);
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [authError, setAuthError] = useState('');
+  const [resetMessage, setResetMessage] = useState('');
   
   const { currentUser, userData } = useAuth();
 
@@ -54,6 +58,33 @@ const LandingPage = ({ onNavigateToCalculation }) => {
       setAuthError('An unexpected error occurred. Please try again.');
     } finally {
       setIsSigningIn(false);
+    }
+  };
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setIsResettingPassword(true);
+    setAuthError('');
+    setResetMessage('');
+    
+    try {
+      const result = await resetPassword(resetEmail);
+      
+      if (result.success) {
+        setResetMessage('Password reset email sent! Check your inbox.');
+        setResetEmail('');
+        // Auto close modal after 3 seconds
+        setTimeout(() => {
+          setShowForgotPasswordModal(false);
+          setResetMessage('');
+        }, 3000);
+      } else {
+        setAuthError(result.error);
+      }
+    } catch (error) {
+      setAuthError('An unexpected error occurred. Please try again.');
+    } finally {
+      setIsResettingPassword(false);
     }
   };
 
@@ -123,11 +154,10 @@ const LandingPage = ({ onNavigateToCalculation }) => {
             </div>
             
             {/* Desktop Navigation */}
-            <nav style={{ 
+            <nav className="desktop-nav" style={{ 
               display: 'flex', 
               alignItems: 'center', 
-              gap: '2rem',
-              '@media (max-width: 768px)': { display: 'none' }
+              gap: '2rem'
             }}>
               <a href="#home" style={{ 
                 color: '#4a5568', 
@@ -209,14 +239,14 @@ const LandingPage = ({ onNavigateToCalculation }) => {
 
             {/* Mobile Menu Button */}
             <button
+              className="mobile-menu-btn"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               style={{
                 display: 'none',
                 background: 'none',
                 border: 'none',
                 fontSize: '24px',
-                cursor: 'pointer',
-                '@media (max-width: 768px)': { display: 'block' }
+                cursor: 'pointer'
               }}
             >
               ☰
@@ -1236,6 +1266,30 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                   >
                     {isSigningIn ? 'Signing in...' : 'Sign in'}
                   </motion.button>
+                  
+                  {/* Forgot Password Link */}
+                  <motion.button
+                    type="button"
+                    onClick={() => {
+                      setShowSignInModal(false);
+                      setShowForgotPasswordModal(true);
+                      setAuthError('');
+                    }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    style={{
+                      background: 'transparent',
+                      color: '#667eea',
+                      border: 'none',
+                      padding: '8px',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      textDecoration: 'underline'
+                    }}
+                  >
+                    Forgot your password?
+                  </motion.button>
 
                   <motion.button
                     type="button"
@@ -1255,6 +1309,190 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                     }}
                   >
                     Cancel
+                  </motion.button>
+                </div>
+
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Forgot Password Modal */}
+      <AnimatePresence>
+        {showForgotPasswordModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowForgotPasswordModal(false)}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0, 0, 0, 0.6)',
+              backdropFilter: 'blur(8px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1000,
+              padding: '1rem'
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                background: 'white',
+                borderRadius: '24px',
+                padding: '3rem',
+                width: '100%',
+                maxWidth: '480px',
+                boxShadow: '0 25px 70px rgba(0, 0, 0, 0.15)'
+              }}
+            >
+              <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+                <img 
+                  src="/images/logoforecastifyedu.jpeg" 
+                  alt="Forecastify EDU Logo"
+                  style={{ 
+                    width: '60px',
+                    height: '60px',
+                    borderRadius: '12px',
+                    objectFit: 'contain',
+                    margin: '0 auto 1.5rem'
+                  }}
+                />
+                <h2 style={{
+                  fontSize: '1.75rem',
+                  fontWeight: '700',
+                  color: '#1a202c',
+                  margin: '0 0 0.5rem'
+                }}>
+                  Reset Password
+                </h2>
+                <p style={{
+                  color: '#4a5568',
+                  fontSize: '1rem',
+                  margin: 0
+                }}>
+                  Enter your email to receive a password reset link
+                </p>
+              </div>
+
+              <form onSubmit={handleForgotPassword}>
+                <div style={{ marginBottom: '2rem' }}>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#1a202c',
+                    marginBottom: '0.5rem'
+                  }}>
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                    placeholder="Enter your email address"
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      border: '2px solid #e2e8f0',
+                      borderRadius: '12px',
+                      fontSize: '16px',
+                      outline: 'none',
+                      transition: 'border-color 0.2s ease',
+                      boxSizing: 'border-box'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                    onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
+                  />
+                </div>
+
+                {/* Success Message */}
+                {resetMessage && (
+                  <div style={{
+                    background: 'rgba(34, 197, 94, 0.1)',
+                    color: '#16a34a',
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    marginBottom: '1rem',
+                    border: '1px solid rgba(34, 197, 94, 0.2)'
+                  }}>
+                    {resetMessage}
+                  </div>
+                )}
+
+                {/* Error Message */}
+                {authError && (
+                  <div style={{
+                    background: 'rgba(239, 68, 68, 0.1)',
+                    color: '#dc2626',
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    marginBottom: '1rem',
+                    border: '1px solid rgba(239, 68, 68, 0.2)'
+                  }}>
+                    {authError}
+                  </div>
+                )}
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  <motion.button
+                    type="submit"
+                    disabled={isResettingPassword}
+                    whileHover={{ scale: isResettingPassword ? 1 : 1.02 }}
+                    whileTap={{ scale: isResettingPassword ? 1 : 0.98 }}
+                    style={{
+                      width: '100%',
+                      background: isResettingPassword 
+                        ? 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)'
+                        : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      color: 'white',
+                      border: 'none',
+                      padding: '16px',
+                      borderRadius: '12px',
+                      fontSize: '16px',
+                      fontWeight: '600',
+                      cursor: isResettingPassword ? 'not-allowed' : 'pointer',
+                      opacity: isResettingPassword ? 0.7 : 1
+                    }}
+                  >
+                    {isResettingPassword ? 'Sending...' : 'Send Reset Email'}
+                  </motion.button>
+
+                  <motion.button
+                    type="button"
+                    onClick={() => {
+                      setShowForgotPasswordModal(false);
+                      setShowSignInModal(true);
+                      setAuthError('');
+                      setResetMessage('');
+                    }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    style={{
+                      width: '100%',
+                      background: 'transparent',
+                      color: '#4a5568',
+                      border: '2px solid #e2e8f0',
+                      padding: '16px',
+                      borderRadius: '12px',
+                      fontSize: '16px',
+                      fontWeight: '600',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Back to Sign In
                   </motion.button>
                 </div>
 

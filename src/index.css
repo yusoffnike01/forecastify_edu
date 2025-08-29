@@ -745,7 +745,25 @@ body {
   }
 }
 
+/* Desktop Navigation */
+.desktop-nav {
+  display: flex;
+}
+
+/* Mobile Menu Button */
+.mobile-menu-btn {
+  display: none;
+}
+
 @media (max-width: 768px) {
+  /* Mobile responsive classes */
+  .desktop-nav {
+    display: none !important;
+  }
+  
+  .mobile-menu-btn {
+    display: block !important;
+  }
   .app-container {
     padding: var(--space-2);
   }
