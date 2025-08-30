@@ -552,10 +552,10 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                 boxShadow: '0 25px 80px rgba(0, 0, 0, 0.15)' 
               }}
               style={{
-                marginTop: '4rem',
+                marginTop: 'clamp(2rem, 5vw, 4rem)',
                 background: 'white',
-                borderRadius: '24px',
-                padding: '2rem',
+                borderRadius: 'clamp(16px, 3vw, 24px)',
+                padding: 'clamp(1rem, 3vw, 2rem)',
                 boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)',
                 border: '1px solid #e2e8f0',
                 cursor: 'pointer'
@@ -567,12 +567,12 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                 transition={{ delay: 3.6, duration: 0.8 }}
                 style={{
                   background: 'linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%)',
-                  borderRadius: '16px',
-                  height: '400px',
+                  borderRadius: 'clamp(12px, 2vw, 16px)',
+                  height: 'clamp(200px, 50vw, 400px)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '18px',
+                  fontSize: 'clamp(14px, 3vw, 18px)',
                   color: '#4a5568',
                   fontWeight: '500',
                   textAlign: 'center',
@@ -604,15 +604,16 @@ const LandingPage = ({ onNavigateToCalculation }) => {
 
         {/* Stats Section */}
         <section style={{ 
-          padding: '4rem 2rem',
+          padding: 'clamp(2rem, 5vw, 4rem) 1rem',
           background: 'white',
           borderTop: '1px solid #e2e8f0'
         }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto', textAlign: 'center' }}>
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-              gap: '3rem'
+              gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+              gap: 'clamp(1.5rem, 4vw, 3rem)',
+              padding: '0 1rem'
             }}>
               {[
                 { number: '10K+', label: 'Active Users', icon: '👥' },
@@ -627,16 +628,27 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                   transition={{ delay: index * 0.1 }}
                   viewport={{ once: true }}
                 >
-                  <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{stat.icon}</div>
                   <div style={{ 
-                    fontSize: '3rem', 
+                    fontSize: 'clamp(1.5rem, 4vw, 2rem)', 
+                    marginBottom: 'clamp(0.25rem, 1vw, 0.5rem)' 
+                  }}>
+                    {stat.icon}
+                  </div>
+                  <div style={{ 
+                    fontSize: 'clamp(2rem, 6vw, 3rem)', 
                     fontWeight: '800', 
                     color: '#1a202c',
-                    marginBottom: '0.5rem'
+                    marginBottom: 'clamp(0.25rem, 1vw, 0.5rem)',
+                    lineHeight: '1.1'
                   }}>
                     {stat.number}
                   </div>
-                  <div style={{ fontSize: '1rem', color: '#4a5568', fontWeight: '500' }}>
+                  <div style={{ 
+                    fontSize: 'clamp(0.875rem, 3vw, 1rem)', 
+                    color: '#4a5568', 
+                    fontWeight: '500',
+                    lineHeight: '1.3'
+                  }}>
                     {stat.label}
                   </div>
                 </motion.div>
@@ -647,7 +659,7 @@ const LandingPage = ({ onNavigateToCalculation }) => {
 
         {/* Features Section */}
         <section id="features" style={{ 
-          padding: '6rem 2rem',
+          padding: 'clamp(3rem, 8vw, 6rem) 1rem',
           background: 'linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%)'
         }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
@@ -697,8 +709,9 @@ const LandingPage = ({ onNavigateToCalculation }) => {
 
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
-              gap: '2rem'
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: 'clamp(1rem, 3vw, 2rem)',
+              padding: '0 1rem'
             }}>
               {[
                 {
@@ -775,7 +788,7 @@ const LandingPage = ({ onNavigateToCalculation }) => {
 
         {/* Testimonials Section */}
         <section style={{ 
-          padding: '6rem 2rem',
+          padding: 'clamp(3rem, 8vw, 6rem) 1rem',
           background: 'white'
         }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
@@ -808,8 +821,9 @@ const LandingPage = ({ onNavigateToCalculation }) => {
 
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-              gap: '2rem'
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: 'clamp(1rem, 3vw, 2rem)',
+              padding: '0 1rem'
             }}>
               {[
                 {
@@ -889,7 +903,7 @@ const LandingPage = ({ onNavigateToCalculation }) => {
 
         {/* About Us Section */}
         <section id="about" style={{ 
-          padding: '6rem 2rem',
+          padding: 'clamp(3rem, 8vw, 6rem) 1rem',
           background: 'linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%)'
         }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
@@ -923,9 +937,10 @@ const LandingPage = ({ onNavigateToCalculation }) => {
 
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-              gap: '2rem',
-              marginTop: '3rem'
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: 'clamp(1rem, 3vw, 2rem)',
+              marginTop: 'clamp(2rem, 4vw, 3rem)',
+              padding: '0 1rem'
             }}>
               {[
                 {
@@ -1061,7 +1076,7 @@ const LandingPage = ({ onNavigateToCalculation }) => {
 
         {/* CTA Section */}
         <section style={{ 
-          padding: '6rem 2rem',
+          padding: 'clamp(3rem, 8vw, 6rem) 1rem',
           background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
           color: 'white',
           textAlign: 'center'
@@ -1158,7 +1173,7 @@ const LandingPage = ({ onNavigateToCalculation }) => {
         <footer style={{
           background: '#1a202c',
           color: 'white',
-          padding: '2rem'
+          padding: 'clamp(1.5rem, 4vw, 2rem)'
         }}>
           <div style={{ maxWidth: '800px', margin: '0 auto' }}>
             <div style={{
