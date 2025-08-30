@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LandingPage from './components/LandingPage';
 import CalculationPage from './components/Calculation/CalculationPage';
+import HelpScreen from './components/Help/HelpScreen';
 import ProtectedRoute from './components/ProtectedRoute';
 import SessionTimer from './components/SessionTimer';
 import { TypingText, FadeUpText } from './components/AnimatedText';
@@ -15,9 +16,9 @@ function AppContent() {
 
   // Auto-redirect authenticated users to calculation page
   useEffect(() => {
-    if (currentUser) {
+    if (currentUser && currentPage === 'home') {
       setCurrentPage('calculation');
-    } else {
+    } else if (!currentUser && currentPage !== 'home' && currentPage !== 'help') {
       setCurrentPage('home');
     }
   }, [currentUser]);
@@ -54,20 +55,18 @@ function AppContent() {
 
   return (
       <div className="app">
-      {/* Header - Only show on calculation page */}
-      {currentPage === 'calculation' && (
+      {/* Header - Show on calculation and help pages */}
+      {(currentPage === 'calculation' || currentPage === 'help') && (
         <motion.header 
           className="app-header"
           initial={{ opacity: 0, y: -30, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.7, ease: "easeOut" }}
           style={{
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            background: 'rgba(255, 255, 255, 0.95)',
             backdropFilter: 'blur(20px)',
-            borderRadius: '0 0 24px 24px',
+            borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
             padding: '1rem 2rem',
-            boxShadow: '0 10px 40px rgba(102, 126, 234, 0.3)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
             position: 'sticky',
             top: 0,
             zIndex: 100
@@ -93,8 +92,7 @@ function AppContent() {
                   width: '50px',
                   height: '50px',
                   borderRadius: '12px',
-                  objectFit: 'contain',
-                  boxShadow: '0 8px 25px rgba(255, 255, 255, 0.2)'
+                  objectFit: 'contain'
                 }}
               />
               <div>
@@ -104,7 +102,7 @@ function AppContent() {
                   style={{ 
                     fontSize: '1.5rem', 
                     fontWeight: '700',
-                    color: '#ffffff',
+                    color: '#1a202c',
                     marginBottom: '2px'
                   }}
                 />
@@ -114,7 +112,7 @@ function AppContent() {
                   delay={1.2}
                   style={{
                     fontSize: '0.8rem',
-                    color: '#e3f2fd',
+                    color: '#4a5568',
                     opacity: 0.9
                   }}
                 />
@@ -123,87 +121,55 @@ function AppContent() {
 
             {/* Navigation Menu */}
             <nav style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-              <motion.a
-                href="#dashboard"
+              <motion.button
+                onClick={() => setCurrentPage('calculation')}
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 0.5 }}
-                whileHover={{ scale: 1.05, color: '#f1f5f9' }}
+                whileHover={{ scale: 1.05 }}
                 style={{
-                  color: 'rgba(255, 255, 255, 0.9)',
+                  background: 'none',
+                  border: 'none',
+                  color: currentPage === 'calculation' ? '#1a202c' : '#4a5568',
                   textDecoration: 'none',
-                  fontWeight: '500',
+                  fontWeight: currentPage === 'calculation' ? '600' : '500',
                   fontSize: '0.95rem',
                   padding: '8px 16px',
                   borderRadius: '8px',
-                  transition: 'all 0.3s ease'
+                  transition: 'all 0.3s ease',
+                  cursor: 'pointer'
                 }}
               >
-                Dashboard
-              </motion.a>
-              
-              <motion.a
-                href="#analytics"
+                User Management
+              </motion.button>
+
+              <motion.button
+                onClick={() => setCurrentPage('help')}
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6, duration: 0.5 }}
-                whileHover={{ scale: 1.05, color: '#f1f5f9' }}
+                whileHover={{ scale: 1.05 }}
                 style={{
-                  color: 'rgba(255, 255, 255, 0.9)',
+                  background: 'none',
+                  border: 'none',
+                  color: currentPage === 'help' ? '#1a202c' : '#4a5568',
                   textDecoration: 'none',
-                  fontWeight: '500',
+                  fontWeight: currentPage === 'help' ? '600' : '500',
                   fontSize: '0.95rem',
                   padding: '8px 16px',
                   borderRadius: '8px',
-                  transition: 'all 0.3s ease'
-                }}
-              >
-                Analytics
-              </motion.a>
-
-              <motion.a
-                href="#reports"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7, duration: 0.5 }}
-                whileHover={{ scale: 1.05, color: '#f1f5f9' }}
-                style={{
-                  color: 'rgba(255, 255, 255, 0.9)',
-                  textDecoration: 'none',
-                  fontWeight: '500',
-                  fontSize: '0.95rem',
-                  padding: '8px 16px',
-                  borderRadius: '8px',
-                  transition: 'all 0.3s ease'
-                }}
-              >
-                Reports
-              </motion.a>
-
-              <motion.a
-                href="#help"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8, duration: 0.5 }}
-                whileHover={{ scale: 1.05, color: '#f1f5f9' }}
-                style={{
-                  color: 'rgba(255, 255, 255, 0.9)',
-                  textDecoration: 'none',
-                  fontWeight: '500',
-                  fontSize: '0.95rem',
-                  padding: '8px 16px',
-                  borderRadius: '8px',
-                  transition: 'all 0.3s ease'
+                  transition: 'all 0.3s ease',
+                  cursor: 'pointer'
                 }}
               >
                 Help
-              </motion.a>
+              </motion.button>
 
               {/* Divider */}
               <div style={{
                 width: '1px',
                 height: '30px',
-                background: 'rgba(255, 255, 255, 0.3)',
+                background: 'rgba(0, 0, 0, 0.1)',
                 margin: '0 8px'
               }} />
 
@@ -215,25 +181,24 @@ function AppContent() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 1.0, duration: 0.5 }}
                 whileHover={{ 
-                  scale: 1.05, 
-                  boxShadow: "0 8px 25px rgba(255,255,255,0.2)",
-                  backgroundColor: "rgba(255,255,255,0.15)"
+                  scale: 1.02, 
+                  boxShadow: "0 8px 25px rgba(102, 126, 234, 0.25)"
                 }}
-                whileTap={{ scale: 0.95 }}
+                whileTap={{ scale: 0.98 }}
                 style={{
-                  background: 'rgba(255,255,255,0.1)',
-                  backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(255,255,255,0.2)',
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  border: 'none',
                   borderRadius: '12px',
                   padding: '10px 20px',
                   color: '#ffffff',
                   fontSize: '0.9rem',
-                  fontWeight: '500',
+                  fontWeight: '600',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px',
-                  transition: 'all 0.3s ease'
+                  transition: 'all 0.3s ease',
+                  boxShadow: '0 4px 20px rgba(102, 126, 234, 0.25)'
                 }}
               >
                 <motion.span 
@@ -258,6 +223,8 @@ function AppContent() {
               key="home"
               onNavigateToCalculation={handleNavigateToCalculation}
             />
+          ) : currentPage === 'help' ? (
+            <HelpScreen key="help" />
           ) : (
             <ProtectedRoute>
               <CalculationPage key="calculation" />

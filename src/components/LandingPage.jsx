@@ -728,11 +728,6 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                   icon: '🎓',
                   title: 'Educational Focus',
                   description: 'Supply Chain Management practices and apply forecasting techniques for planning. Perfect for fundamentals of supply chain management education.'
-                },
-                {
-                  icon: '📱',
-                  title: 'Works Everywhere',
-                  description: 'Access your forecasts on any device. Fully responsive and optimized experience.'
                 }
               ].map((feature, index) => (
                 <motion.div
