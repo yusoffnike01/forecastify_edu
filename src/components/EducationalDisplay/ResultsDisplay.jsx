@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const ResultsDisplay = ({ historicalData, forecastedData, statistics, onExportClick }) => {
+const ResultsDisplay = ({ historicalData, forecastedData, statistics, selectedCurrency, formatCurrency, onExportClick }) => {
   const [showCalculations, setShowCalculations] = useState(false);
 
   const handleExportClick = () => {
@@ -19,7 +19,19 @@ const ResultsDisplay = ({ historicalData, forecastedData, statistics, onExportCl
         flexWrap: 'wrap',
         gap: 'var(--space-4)'
       }}>
-        <h3 className="section-title">📋 Results & Calculations</h3>
+        <div>
+          <h3 className="section-title">📋 Results & Calculations</h3>
+          {selectedCurrency && (
+            <div style={{
+              fontSize: '0.9rem',
+              color: '#6b7280',
+              marginTop: '-0.5rem',
+              marginBottom: '1rem'
+            }}>
+              Currency: <strong>{selectedCurrency}</strong> • Values automatically converted
+            </div>
+          )}
+        </div>
         <div style={{
           display: 'flex',
           gap: 'var(--space-3)',
@@ -47,15 +59,19 @@ const ResultsDisplay = ({ historicalData, forecastedData, statistics, onExportCl
       {/* Summary Statistics */}
       <div className="stats-grid">
         <div className="stat-card">
-          <div className="stat-title">Total Historical Sales</div>
-          <div className="stat-value">{statistics.totalHistorical?.toLocaleString()}</div>
-          <div className="stat-change">units</div>
+          <div className="stat-title">Total Historical Value</div>
+          <div className="stat-value" style={{ fontSize: '1.5rem' }}>
+            {formatCurrency ? formatCurrency(statistics.totalHistorical || 0) : (statistics.totalHistorical?.toLocaleString() + ' units')}
+          </div>
+          <div className="stat-change">{statistics.totalHistorical?.toLocaleString()} units</div>
         </div>
         
         <div className="stat-card">
-          <div className="stat-title">Total Forecasted Sales</div>
-          <div className="stat-value">{statistics.totalForecasted?.toLocaleString()}</div>
-          <div className="stat-change">units</div>
+          <div className="stat-title">Total Forecasted Value</div>
+          <div className="stat-value" style={{ fontSize: '1.5rem' }}>
+            {formatCurrency ? formatCurrency(statistics.totalForecasted || 0) : (statistics.totalForecasted?.toLocaleString() + ' units')}
+          </div>
+          <div className="stat-change">{statistics.totalForecasted?.toLocaleString()} units</div>
         </div>
         
         <div className="stat-card">
@@ -89,7 +105,7 @@ const ResultsDisplay = ({ historicalData, forecastedData, statistics, onExportCl
             }}>
               <div>Year</div>
               <div>Type</div>
-              <div>Sales (Units)</div>
+              <div>Sales Value ({selectedCurrency || 'Units'})</div>
               <div>Change (%)</div>
             </div>
           </div>
@@ -98,7 +114,9 @@ const ResultsDisplay = ({ historicalData, forecastedData, statistics, onExportCl
             <div key={`hist-${index}`} className="results-table-row">
               <div className="results-table-cell">{item.year}</div>
               <div className="results-table-cell highlight">Historical</div>
-              <div className="results-table-cell">{item.sales.toLocaleString()}</div>
+              <div className="results-table-cell">
+                {formatCurrency ? formatCurrency(item.sales) : item.sales.toLocaleString()}
+              </div>
               <div className="results-table-cell">
                 {index > 0 
                   ? (((item.sales - historicalData[index - 1].sales) / historicalData[index - 1].sales) * 100).toFixed(2)
@@ -112,7 +130,9 @@ const ResultsDisplay = ({ historicalData, forecastedData, statistics, onExportCl
             <div key={`forecast-${index}`} className="results-table-row">
               <div className="results-table-cell">{item.year}</div>
               <div className="results-table-cell highlight">Forecasted</div>
-              <div className="results-table-cell">{item.sales.toLocaleString()}</div>
+              <div className="results-table-cell">
+                {formatCurrency ? formatCurrency(item.sales) : item.sales.toLocaleString()}
+              </div>
               <div className="results-table-cell">
                 {item.percentage >= 0 ? '+' : ''}{item.percentage}%
               </div>

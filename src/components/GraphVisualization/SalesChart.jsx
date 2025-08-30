@@ -1,6 +1,6 @@
 import { LineChart, Line, BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-const SalesChart = ({ data, graphType = 'line' }) => {
+const SalesChart = ({ data, graphType = 'line', showOriginalValues = true }) => {
   console.log('SalesChart Data:', data); // Debug log
 
   // Modern color palette matching the new design
@@ -11,6 +11,14 @@ const SalesChart = ({ data, graphType = 'line' }) => {
     text: '#475569',
     tooltip: '#ffffff',
     tooltipBorder: '#cbd5e1'
+  };
+
+  // Custom tooltip formatter to show units
+  const customTooltipFormatter = (value, name, props) => {
+    if (value) {
+      return [`${value.toLocaleString()} units`, name];
+    }
+    return [null, name];
   };
 
   const renderChart = () => {
@@ -37,6 +45,7 @@ const SalesChart = ({ data, graphType = 'line' }) => {
               tick={{ fontSize: window.innerWidth <= 480 ? 10 : 12 }}
             />
             <Tooltip 
+              formatter={customTooltipFormatter}
               contentStyle={{
                 backgroundColor: colors.tooltip,
                 border: `1px solid ${colors.tooltipBorder}`,
@@ -100,6 +109,7 @@ const SalesChart = ({ data, graphType = 'line' }) => {
               tick={{ fontSize: window.innerWidth <= 480 ? 10 : 12 }}
             />
             <Tooltip 
+              formatter={customTooltipFormatter}
               contentStyle={{
                 backgroundColor: colors.tooltip,
                 border: `1px solid ${colors.tooltipBorder}`,
@@ -146,6 +156,7 @@ const SalesChart = ({ data, graphType = 'line' }) => {
               tick={{ fontSize: window.innerWidth <= 480 ? 10 : 12 }}
             />
             <Tooltip 
+              formatter={customTooltipFormatter}
               contentStyle={{
                 backgroundColor: colors.tooltip,
                 border: `1px solid ${colors.tooltipBorder}`,
@@ -196,6 +207,7 @@ const SalesChart = ({ data, graphType = 'line' }) => {
               tick={{ fontSize: window.innerWidth <= 480 ? 10 : 12 }}
             />
             <Tooltip 
+              formatter={customTooltipFormatter}
               contentStyle={{
                 backgroundColor: colors.tooltip,
                 border: `1px solid ${colors.tooltipBorder}`,

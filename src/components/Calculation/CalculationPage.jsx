@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -28,6 +28,80 @@ const CalculationPage = () => {
   const [isCalculating, setIsCalculating] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [exportType, setExportType] = useState('pdf');
+  const [selectedCurrency, setSelectedCurrency] = useState('MYR');
+  const [exchangeRates, setExchangeRates] = useState({
+    MYR: 1,      // Base currency (Ringgit Malaysia)
+    USD: 0.22,   // 1 MYR = 0.22 USD
+    EUR: 0.20,   // 1 MYR = 0.20 EUR
+    GBP: 0.17,   // 1 MYR = 0.17 GBP
+    JPY: 32.5,   // 1 MYR = 32.5 JPY
+    SGD: 0.30,   // 1 MYR = 0.30 SGD
+    AUD: 0.33,   // 1 MYR = 0.33 AUD
+    CAD: 0.30    // 1 MYR = 0.30 CAD
+  });
+  const [isLoadingRates, setIsLoadingRates] = useState(false);
+
+  // Fetch live exchange rates from API
+  const fetchExchangeRates = async () => {
+    setIsLoadingRates(true);
+    try {
+      // Using free API service for exchange rates (MYR as base)
+      const response = await fetch('https://api.exchangerate-api.com/v4/latest/MYR');
+      const data = await response.json();
+      
+      if (data && data.rates) {
+        setExchangeRates({
+          MYR: 1,
+          USD: data.rates.USD || 0.22,
+          EUR: data.rates.EUR || 0.20,
+          GBP: data.rates.GBP || 0.17,
+          JPY: data.rates.JPY || 32.5,
+          SGD: data.rates.SGD || 0.30,
+          AUD: data.rates.AUD || 0.33,
+          CAD: data.rates.CAD || 0.30
+        });
+        console.log('Live exchange rates updated successfully');
+      }
+    } catch (error) {
+      console.warn('Failed to fetch live rates, using default rates:', error);
+      // Keep default rates if API fails
+    } finally {
+      setIsLoadingRates(false);
+    }
+  };
+
+  // Currency conversion function (MYR as base)
+  const convertCurrency = (amount, fromCurrency = 'MYR', toCurrency = selectedCurrency) => {
+    if (fromCurrency === toCurrency) return amount;
+    // Convert from MYR to target currency
+    const myrAmount = fromCurrency === 'MYR' ? amount : amount / exchangeRates[fromCurrency];
+    return toCurrency === 'MYR' ? myrAmount : myrAmount * exchangeRates[toCurrency];
+  };
+
+  // Format currency display
+  const formatCurrency = (amount, currency = selectedCurrency) => {
+    const convertedAmount = convertCurrency(amount);
+    const currencySymbols = {
+      USD: '$',
+      EUR: '€',
+      GBP: '£',
+      JPY: '¥',
+      MYR: 'RM',
+      SGD: 'S$',
+      AUD: 'A$',
+      CAD: 'C$'
+    };
+    
+    return `${currencySymbols[currency] || currency} ${convertedAmount.toLocaleString(undefined, {
+      minimumFractionDigits: currency === 'JPY' ? 0 : 2,
+      maximumFractionDigits: currency === 'JPY' ? 0 : 2
+    })}`;
+  };
+
+  // Fetch exchange rates on component mount
+  useEffect(() => {
+    fetchExchangeRates();
+  }, []);
 
   // Handle calculation process
   const handleCalculate = async () => {
@@ -699,42 +773,111 @@ const CalculationPage = () => {
               </motion.button>
             </div>
 
-            {/* Chart Type Selector */}
+            {/* Chart Type and Currency Selectors */}
             <div style={{ 
               display: 'flex', 
               alignItems: 'center', 
               justifyContent: 'center',
-              gap: 'var(--space-3)',
+              gap: 'var(--space-6)',
               flexWrap: 'wrap'
             }}>
-              <label style={{ 
-                fontSize: '1rem', 
-                fontWeight: '600', 
-                color: '#374151'
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 'var(--space-3)'
               }}>
-                Chart Type:
-              </label>
-              <select
-                value={chartType}
-                onChange={(e) => setChartType(e.target.value)}
-                style={{
-                  padding: 'var(--space-3) var(--space-4)',
-                  borderRadius: '12px',
-                  border: '2px solid #e5e7eb',
-                  fontSize: '1rem',
-                  background: 'white',
-                  cursor: 'pointer',
-                  fontWeight: '500',
-                  outline: 'none',
-                  transition: 'border-color 0.3s ease'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#667eea'}
-                onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-              >
-                <option value="line">📈 Line Chart</option>
-                <option value="bar">📊 Bar Chart</option>
-                <option value="area">📉 Area Chart</option>
-              </select>
+                <label style={{ 
+                  fontSize: '1rem', 
+                  fontWeight: '600', 
+                  color: '#374151'
+                }}>
+                  Chart Type:
+                </label>
+                <select
+                  value={chartType}
+                  onChange={(e) => setChartType(e.target.value)}
+                  style={{
+                    padding: 'var(--space-3) var(--space-4)',
+                    borderRadius: '12px',
+                    border: '2px solid #e5e7eb',
+                    fontSize: '1rem',
+                    background: 'white',
+                    cursor: 'pointer',
+                    fontWeight: '500',
+                    outline: 'none',
+                    transition: 'border-color 0.3s ease'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                  onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
+                >
+                  <option value="line">📈 Line Chart</option>
+                  <option value="bar">📊 Bar Chart</option>
+                  <option value="area">📉 Area Chart</option>
+                </select>
+              </div>
+
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 'var(--space-3)',
+                flexWrap: 'wrap'
+              }}>
+                <label style={{ 
+                  fontSize: '1rem', 
+                  fontWeight: '600', 
+                  color: '#374151'
+                }}>
+                  Currency:
+                </label>
+                <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
+                  <select
+                    value={selectedCurrency}
+                    onChange={(e) => setSelectedCurrency(e.target.value)}
+                    style={{
+                      padding: 'var(--space-3) var(--space-4)',
+                      borderRadius: '12px',
+                      border: '2px solid #e5e7eb',
+                      fontSize: '1rem',
+                      background: 'white',
+                      cursor: 'pointer',
+                      fontWeight: '500',
+                      outline: 'none',
+                      transition: 'border-color 0.3s ease',
+                      minWidth: '140px'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                    onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
+                  >
+                    <option value="MYR">🇲🇾 MYR (RM)</option>
+                    <option value="USD">🇺🇸 USD ($)</option>
+                    <option value="EUR">🇪🇺 EUR (€)</option>
+                    <option value="GBP">🇬🇧 GBP (£)</option>
+                    <option value="JPY">🇯🇵 JPY (¥)</option>
+                    <option value="SGD">🇸🇬 SGD (S$)</option>
+                    <option value="AUD">🇦🇺 AUD (A$)</option>
+                    <option value="CAD">🇨🇦 CAD (C$)</option>
+                  </select>
+                  <motion.button
+                    onClick={fetchExchangeRates}
+                    disabled={isLoadingRates}
+                    whileHover={{ scale: isLoadingRates ? 1 : 1.05 }}
+                    whileTap={{ scale: isLoadingRates ? 1 : 0.95 }}
+                    style={{
+                      padding: 'var(--space-3)',
+                      borderRadius: '8px',
+                      border: '2px solid #e5e7eb',
+                      background: 'white',
+                      cursor: isLoadingRates ? 'not-allowed' : 'pointer',
+                      fontSize: '0.9rem',
+                      opacity: isLoadingRates ? 0.6 : 1,
+                      transition: 'all 0.3s ease'
+                    }}
+                    title="Update exchange rates"
+                  >
+                    {isLoadingRates ? '🔄' : '💱'}
+                  </motion.button>
+                </div>
+              </div>
             </div>
           </motion.div>
 
@@ -852,7 +995,7 @@ const CalculationPage = () => {
                     color: '#6b7280',
                     margin: '8px 0 0 0'
                   }}>
-                    {chartType === 'line' ? 'Line Chart' : chartType === 'bar' ? 'Bar Chart' : 'Area Chart'} • {results.combinedData?.length || 0} data points
+                    {chartType === 'line' ? 'Line Chart' : chartType === 'bar' ? 'Bar Chart' : 'Area Chart'} • {results.combinedData?.length || 0} data points • Values in <strong>units</strong>
                   </p>
                 </div>
                 
@@ -861,6 +1004,7 @@ const CalculationPage = () => {
                   <SalesChart 
                     data={results.combinedData}
                     graphType={chartType}
+                    showOriginalValues={true}
                   />
                   
                   {/* Chart Loading/Error Fallback */}
@@ -918,6 +1062,8 @@ const CalculationPage = () => {
                   historicalData={historicalData}
                   forecastedData={results.forecastedData}
                   statistics={results.statistics}
+                  selectedCurrency={selectedCurrency}
+                  formatCurrency={formatCurrency}
                   onExportClick={(type = 'pdf') => {
                     setExportType(type);
                     setShowExportModal(true);

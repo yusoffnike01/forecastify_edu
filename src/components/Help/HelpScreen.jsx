@@ -123,6 +123,68 @@ const HelpScreen = () => {
             name: 'User Management',
             description: 'Manage user accounts and access controls for educational institutions.',
             icon: '👥'
+          },
+          {
+            name: 'Currency Conversion',
+            description: 'Multi-currency support with live exchange rates for global financial analysis.',
+            icon: '💱'
+          }
+        ]
+      }
+    },
+    {
+      id: 'currency',
+      title: '💱 Currency Conversion',
+      icon: '💰',
+      content: {
+        title: 'Currency Conversion Features',
+        description: 'Learn how to use the multi-currency support for global analysis:',
+        features: [
+          {
+            name: 'Default Currency: Malaysian Ringgit (RM)',
+            description: 'All input values are in MYR by default. This is the base currency for calculations.',
+            icon: '🇲🇾',
+            details: 'When you enter sales data (e.g., 1000), it represents RM 1,000 in value.'
+          },
+          {
+            name: 'Live Exchange Rates',
+            description: 'Real-time currency conversion using live API data from international markets.',
+            icon: '🌐',
+            details: 'Exchange rates update automatically when you load the page. Click the 💱 button to refresh rates.'
+          },
+          {
+            name: 'Supported Currencies',
+            description: 'Convert your forecast results to 8 major global currencies.',
+            icon: '💹',
+            details: 'USD ($), EUR (€), GBP (£), JPY (¥), MYR (RM), SGD (S$), AUD (A$), CAD (C$)'
+          },
+          {
+            name: 'Chart vs Results Display',
+            description: 'Charts show original units, while results tables show converted currency values.',
+            icon: '📊',
+            details: 'Chart: Shows 1,000 units (unchanged). Results: Shows RM 1,000 → $220 (converted).'
+          }
+        ],
+        howToUse: [
+          {
+            step: 1,
+            title: 'Enter Data in RM',
+            description: 'Input your historical sales values in Malaysian Ringgit (default currency).'
+          },
+          {
+            step: 2,
+            title: 'Select Target Currency',
+            description: 'Choose your preferred currency from the dropdown menu next to Chart Type.'
+          },
+          {
+            step: 3,
+            title: 'View Converted Results',
+            description: 'Results tables automatically show converted values while charts show original units.'
+          },
+          {
+            step: 4,
+            title: 'Refresh Exchange Rates',
+            description: 'Click the 💱 button to get the latest exchange rates from live market data.'
           }
         ]
       }
@@ -159,6 +221,16 @@ const HelpScreen = () => {
             problem: 'Performance issues',
             solution: 'Close other browser tabs and ensure you have a stable internet connection for optimal performance.',
             icon: '🐌'
+          },
+          {
+            problem: 'Currency conversion not working',
+            solution: 'Check your internet connection and try clicking the 💱 refresh button to update exchange rates. If problem persists, the default rates will be used.',
+            icon: '💱'
+          },
+          {
+            problem: 'Exchange rates seem outdated',
+            solution: 'Click the 💱 button next to the currency selector to fetch the latest live exchange rates from the API.',
+            icon: '🔄'
           }
         ]
       }
@@ -556,6 +628,144 @@ const HelpScreen = () => {
                             color: '#6b7280'
                           }}>
                             {feature.description}
+                          </p>
+                        </motion.div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Currency Section */}
+                  {activeSection === 'currency' && (
+                    <div>
+                      {/* Currency Features */}
+                      <h3 style={{
+                        fontSize: '1.3rem',
+                        fontWeight: '600',
+                        color: '#1a202c',
+                        marginBottom: '1rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}>
+                        💰 Currency Features
+                      </h3>
+                      
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                        gap: '1rem',
+                        marginBottom: '2rem'
+                      }}>
+                        {currentSection.content.features.map((feature, index) => (
+                          <motion.div
+                            key={index}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                            style={{
+                              background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
+                              borderRadius: '16px',
+                              padding: '1.5rem',
+                              border: '1px solid #0284c7',
+                              textAlign: 'center'
+                            }}
+                          >
+                            <div style={{
+                              fontSize: '2rem',
+                              marginBottom: '0.5rem'
+                            }}>
+                              {feature.icon}
+                            </div>
+                            <h4 style={{
+                              fontSize: '1rem',
+                              fontWeight: '600',
+                              color: '#0c4a6e',
+                              marginBottom: '0.5rem'
+                            }}>
+                              {feature.name}
+                            </h4>
+                            <p style={{
+                              margin: '0 0 0.5rem 0',
+                              fontSize: '0.85rem',
+                              color: '#075985'
+                            }}>
+                              {feature.description}
+                            </p>
+                            <p style={{
+                              margin: 0,
+                              fontSize: '0.8rem',
+                              color: '#0369a1',
+                              fontStyle: 'italic'
+                            }}>
+                              {feature.details}
+                            </p>
+                          </motion.div>
+                        ))}
+                      </div>
+
+                      {/* How to Use Currency */}
+                      <h3 style={{
+                        fontSize: '1.3rem',
+                        fontWeight: '600',
+                        color: '#1a202c',
+                        marginBottom: '1rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}>
+                        📝 How to Use Currency Conversion
+                      </h3>
+                      
+                      {currentSection.content.howToUse.map((step, index) => (
+                        <motion.div
+                          key={index}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                          style={{
+                            background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
+                            borderRadius: '16px',
+                            padding: '1.5rem',
+                            marginBottom: '1rem',
+                            border: '1px solid #16a34a'
+                          }}
+                        >
+                          <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '12px',
+                            marginBottom: '0.5rem'
+                          }}>
+                            <div style={{
+                              background: 'linear-gradient(135deg, #059669 0%, #0d9488 100%)',
+                              color: 'white',
+                              width: '30px',
+                              height: '30px',
+                              borderRadius: '50%',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '14px',
+                              fontWeight: '700'
+                            }}>
+                              {step.step}
+                            </div>
+                            <h4 style={{
+                              fontSize: '1.1rem',
+                              fontWeight: '600',
+                              color: '#14532d',
+                              margin: 0
+                            }}>
+                              {step.title}
+                            </h4>
+                          </div>
+                          <p style={{
+                            margin: 0,
+                            fontSize: '0.9rem',
+                            color: '#166534',
+                            paddingLeft: '42px'
+                          }}>
+                            {step.description}
                           </p>
                         </motion.div>
                       ))}
