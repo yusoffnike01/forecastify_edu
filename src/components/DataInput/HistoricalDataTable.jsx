@@ -14,7 +14,7 @@ const HistoricalDataTable = ({ data, onDataChange }) => {
   };
 
   const handleAddYear = () => {
-    if (data.length < 10) {
+    if (data.length < 5) {
       const lastYear = data.length > 0 ? data[data.length - 1].year : 2020;
       const newData = [...data, { year: lastYear + 1, sales: 0 }];
       onDataChange(newData);
@@ -43,6 +43,7 @@ const HistoricalDataTable = ({ data, onDataChange }) => {
           type="button"
           className="btn btn-primary"
           onClick={handleAddYear}
+          disabled={data.length >= 5}
           style={{ color: 'white' }}
         >
           ➕ Add Year
@@ -114,7 +115,7 @@ const HistoricalDataTable = ({ data, onDataChange }) => {
         marginTop: 'var(--space-4)',
         textAlign: 'center'
       }}>   
-        💡 Add or remove years as needed. Minimum 3 years required for calculation.
+        💡 Maximum 5 years allowed. Minimum 1 year required for calculation.
       </p>
     </div>
   );

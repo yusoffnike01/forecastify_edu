@@ -47,6 +47,7 @@ const ForecastingParameters = ({ parameters, onParametersChange }) => {
           type="button"
           className="btn btn-primary"
           onClick={handleAddYear}
+          disabled={parameters.length >= 5}
           style={{ color: 'white' }}
         >
           ➕ Add Year
@@ -120,6 +121,16 @@ const ForecastingParameters = ({ parameters, onParametersChange }) => {
           </div>
         ))}
       </div>
+
+      <p style={{ 
+        fontSize: '0.875rem', 
+        color: 'var(--gray-500)', 
+        fontStyle: 'italic', 
+        marginTop: 'var(--space-4)',
+        textAlign: 'center'
+      }}>   
+        💡 Maximum 5 years allowed. Minimum 1 year required for forecasting.
+      </p>
 
       {/* Example Parameters */}
       <div className="insights-section" style={{ marginTop: 'var(--space-6)' }}>
