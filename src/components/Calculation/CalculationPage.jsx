@@ -494,15 +494,23 @@ const CalculationPage = () => {
             animate={{ scale: 1, rotate: 0 }}
             transition={{ delay: 0.3, duration: 0.6, type: "spring" }}
             style={{ 
-              fontSize: '4rem', 
               marginBottom: '1rem',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
               display: 'inline-block'
             }}
           >
-            📊
+            <motion.img
+              src="/images/logoforecastifyedu.jpeg"
+              alt="Forecastify EDU"
+              whileHover={{ scale: 1.05, rotate: [0, -2, 2, 0] }}
+              transition={{ duration: 0.3 }}
+              style={{
+                width: '180px',
+                height: '180px',
+                borderRadius: '24px',
+                objectFit: 'contain',
+                background: '#ffffff'
+              }}
+            />
           </motion.div>
           <motion.h1
             initial={{ opacity: 0 }}
