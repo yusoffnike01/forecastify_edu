@@ -6,6 +6,7 @@ import HelpScreen from './components/Help/HelpScreen';
 import ProtectedRoute from './components/ProtectedRoute';
 import SessionTimer from './components/SessionTimer';
 import { TypingText, FadeUpText } from './components/AnimatedText';
+import UserManagement from './components/UserManagement';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { signOutUser } from './firebase/auth';
 import './App.css';
@@ -35,8 +36,8 @@ function AppContent() {
 
   // Additional protection: prevent direct page setting without authentication
   const safeSetCurrentPage = (page) => {
-    if (page === 'calculation' && !currentUser) {
-      // Force stay on home page if trying to access calculation without auth
+    if ((page === 'calculation' || page === 'users') && !currentUser) {
+      // Force stay on home page if trying to access protected pages without auth
       setCurrentPage('home');
       return;
     }
@@ -55,8 +56,8 @@ function AppContent() {
 
   return (
       <div className="app">
-      {/* Header - Show on calculation and help pages */}
-      {(currentPage === 'calculation' || currentPage === 'help') && (
+      {/* Header - Show on calculation, users and help pages */}
+      {(currentPage === 'calculation' || currentPage === 'users' || currentPage === 'help') && (
         <motion.header 
           className="app-header"
           initial={{ opacity: 0, y: -30, scale: 0.95 }}
@@ -140,6 +141,28 @@ function AppContent() {
                   cursor: 'pointer'
                 }}
               >
+                Forecasting
+              </motion.button>
+
+              <motion.button
+                onClick={() => setCurrentPage('users')}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6, duration: 0.5 }}
+                whileHover={{ scale: 1.05 }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: currentPage === 'users' ? '#1a202c' : '#4a5568',
+                  textDecoration: 'none',
+                  fontWeight: currentPage === 'users' ? '600' : '500',
+                  fontSize: '0.95rem',
+                  padding: '8px 16px',
+                  borderRadius: '8px',
+                  transition: 'all 0.3s ease',
+                  cursor: 'pointer'
+                }}
+              >
                 User Management
               </motion.button>
 
@@ -147,7 +170,7 @@ function AppContent() {
                 onClick={() => setCurrentPage('help')}
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6, duration: 0.5 }}
+                transition={{ delay: 0.7, duration: 0.5 }}
                 whileHover={{ scale: 1.05 }}
                 style={{
                   background: 'none',
@@ -179,7 +202,7 @@ function AppContent() {
                 onClick={handleLogout}
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 1.0, duration: 0.5 }}
+                transition={{ delay: 1.1, duration: 0.5 }}
                 whileHover={{ 
                   scale: 1.02, 
                   boxShadow: "0 8px 25px rgba(102, 126, 234, 0.25)"
@@ -225,6 +248,10 @@ function AppContent() {
             />
           ) : currentPage === 'help' ? (
             <HelpScreen key="help" />
+          ) : currentPage === 'users' ? (
+            <ProtectedRoute>
+              <UserManagement key="users" />
+            </ProtectedRoute>
           ) : (
             <ProtectedRoute>
               <CalculationPage key="calculation" />
@@ -233,8 +260,8 @@ function AppContent() {
         </AnimatePresence>
       </main>
 
-      {/* Session Timer - Only show when on calculation page */}
-      {currentPage === 'calculation' && <SessionTimer />}
+      {/* Session Timer - Show on calculation and users pages */}
+      {(currentPage === 'calculation' || currentPage === 'users') && <SessionTimer />}
 
       </div>
   );

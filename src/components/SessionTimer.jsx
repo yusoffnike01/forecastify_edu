@@ -14,6 +14,7 @@ const SessionTimer = () => {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
+        className="session-timer"
         style={{
           position: 'fixed',
           top: '20px',

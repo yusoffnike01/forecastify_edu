@@ -6,7 +6,6 @@ import HistoricalDataTable from '../DataInput/HistoricalDataTable';
 import ForecastingParameters from '../DataInput/ForecastingParameters';
 import SalesChart from '../GraphVisualization/SalesChart';
 import ResultsDisplay from '../EducationalDisplay/ResultsDisplay';
-import UserManagement from '../UserManagement';
 import { calculateForecast, combineDataForGraph, calculateStatistics, validateData } from '../../utils/calculations';
 
 const CalculationPage = () => {
@@ -29,7 +28,6 @@ const CalculationPage = () => {
   const [isCalculating, setIsCalculating] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [exportType, setExportType] = useState('pdf');
-  const [activeTab, setActiveTab] = useState('forecasting'); // 'forecasting' or 'users'
 
   // Handle calculation process
   const handleCalculate = async () => {
@@ -400,78 +398,8 @@ const CalculationPage = () => {
         margin: '0 auto'
       }}>
 
-        {/* Tab Navigation */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            marginBottom: '2rem',
-            background: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(20px)',
-            borderRadius: '16px',
-            padding: '8px',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-            boxShadow: '0 15px 35px rgba(0, 0, 0, 0.1)',
-            maxWidth: '400px',
-            margin: '0 auto 2rem'
-          }}
-        >
-          <motion.button
-            onClick={() => setActiveTab('forecasting')}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            style={{
-              flex: 1,
-              padding: '12px 24px',
-              borderRadius: '12px',
-              border: 'none',
-              fontSize: '16px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              background: activeTab === 'forecasting' 
-                ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                : 'transparent',
-              color: activeTab === 'forecasting' ? 'white' : '#4a5568',
-              boxShadow: activeTab === 'forecasting' 
-                ? '0 8px 25px rgba(102, 126, 234, 0.3)'
-                : 'none'
-            }}
-          >
-            📊 Forecasting
-          </motion.button>
-          
-          <motion.button
-            onClick={() => setActiveTab('users')}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            style={{
-              flex: 1,
-              padding: '12px 24px',
-              borderRadius: '12px',
-              border: 'none',
-              fontSize: '16px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              background: activeTab === 'users' 
-                ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                : 'transparent',
-              color: activeTab === 'users' ? 'white' : '#4a5568',
-              boxShadow: activeTab === 'users' 
-                ? '0 8px 25px rgba(102, 126, 234, 0.3)'
-                : 'none'
-            }}
-          >
-            👥 User Management
-          </motion.button>
-        </motion.div>
 
-        {/* Forecasting Tab Content */}
-        {activeTab === 'forecasting' && (
+        {/* Forecasting Content */}
         <div>
         {/* Header */}
         <motion.div
@@ -1132,18 +1060,6 @@ const CalculationPage = () => {
           )}
         </AnimatePresence>
         </div>
-        )}
-
-        {/* User Management Tab */}
-        {activeTab === 'users' && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-          >
-            <UserManagement />
-          </motion.div>
-        )}
 
       </div>
       </div>
