@@ -22,6 +22,26 @@ function AppContent() {
     }
   }, [currentUser]);
 
+  // Navigation handler with authentication check
+  const handleNavigateToCalculation = () => {
+    if (!currentUser) {
+      // User is not authenticated, stay on home page
+      // The landing page should handle showing sign-in modal
+      return;
+    }
+    setCurrentPage('calculation');
+  };
+
+  // Additional protection: prevent direct page setting without authentication
+  const safeSetCurrentPage = (page) => {
+    if (page === 'calculation' && !currentUser) {
+      // Force stay on home page if trying to access calculation without auth
+      setCurrentPage('home');
+      return;
+    }
+    setCurrentPage(page);
+  };
+
   const handleLogout = async () => {
     try {
       await signOutUser();
@@ -236,10 +256,12 @@ function AppContent() {
           {currentPage === 'home' ? (
             <LandingPage 
               key="home"
-              onNavigateToCalculation={() => setCurrentPage('calculation')}
+              onNavigateToCalculation={handleNavigateToCalculation}
             />
           ) : (
-            <CalculationPage key="calculation" />
+            <ProtectedRoute>
+              <CalculationPage key="calculation" />
+            </ProtectedRoute>
           )}
         </AnimatePresence>
       </main>

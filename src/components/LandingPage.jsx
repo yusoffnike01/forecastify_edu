@@ -254,6 +254,134 @@ const LandingPage = ({ onNavigateToCalculation }) => {
           </div>
         </motion.header>
 
+        {/* Mobile Menu Overlay */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              style={{
+                position: 'fixed',
+                top: '80px',
+                left: 0,
+                right: 0,
+                zIndex: 40,
+                background: 'rgba(255, 255, 255, 0.98)',
+                backdropFilter: 'blur(20px)',
+                borderBottom: '1px solid rgba(0, 0, 0, 0.1)',
+                padding: '1rem 2rem'
+              }}
+            >
+              <motion.nav
+                initial={{ y: -10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -10, opacity: 0 }}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '1rem'
+                }}
+              >
+                <a href="#home" onClick={() => setIsMobileMenuOpen(false)} style={{
+                  color: '#4a5568',
+                  textDecoration: 'none',
+                  fontWeight: '500',
+                  fontSize: '16px',
+                  padding: '12px 0',
+                  borderBottom: '1px solid rgba(0,0,0,0.1)'
+                }}>
+                  Home
+                </a>
+                <a href="#features" onClick={() => setIsMobileMenuOpen(false)} style={{
+                  color: '#4a5568',
+                  textDecoration: 'none',
+                  fontWeight: '500',
+                  fontSize: '16px',
+                  padding: '12px 0',
+                  borderBottom: '1px solid rgba(0,0,0,0.1)'
+                }}>
+                  Features
+                </a>
+                <a href="#about" onClick={() => setIsMobileMenuOpen(false)} style={{
+                  color: '#4a5568',
+                  textDecoration: 'none',
+                  fontWeight: '500',
+                  fontSize: '16px',
+                  padding: '12px 0',
+                  borderBottom: '1px solid rgba(0,0,0,0.1)'
+                }}>
+                  About
+                </a>
+                
+                {currentUser ? (
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '12px',
+                    paddingTop: '12px'
+                  }}>
+                    <div style={{
+                      padding: '12px 16px',
+                      background: 'rgba(102, 126, 234, 0.1)',
+                      borderRadius: '12px',
+                      fontSize: '14px',
+                      color: '#667eea',
+                      fontWeight: '500',
+                      textAlign: 'center'
+                    }}>
+                      👋 {userData?.displayName || currentUser.email}
+                    </div>
+                    <motion.button
+                      onClick={async () => {
+                        await signOutUser();
+                        setIsMobileMenuOpen(false);
+                      }}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      style={{
+                        background: 'rgba(239, 68, 68, 0.1)',
+                        color: '#dc2626',
+                        border: '1px solid rgba(239, 68, 68, 0.2)',
+                        padding: '12px 16px',
+                        borderRadius: '12px',
+                        fontWeight: '500',
+                        fontSize: '14px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Logout
+                    </motion.button>
+                  </div>
+                ) : (
+                  <motion.button
+                    onClick={() => {
+                      setShowSignInModal(true);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    style={{
+                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      color: 'white',
+                      border: 'none',
+                      padding: '12px 24px',
+                      borderRadius: '12px',
+                      fontWeight: '600',
+                      fontSize: '14px',
+                      cursor: 'pointer',
+                      boxShadow: '0 4px 20px rgba(102, 126, 234, 0.25)',
+                      marginTop: '12px'
+                    }}
+                  >
+                    Sign In
+                  </motion.button>
+                )}
+              </motion.nav>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Hero Section */}
         <motion.section
           id="home"
@@ -303,7 +431,7 @@ const LandingPage = ({ onNavigateToCalculation }) => {
               <AnimatedText
                 text="Welcome to Fundamentals of"
                 style={{
-                  fontSize: 'clamp(3rem, 8vw, 5.5rem)',
+                  fontSize: 'clamp(1.8rem, 6vw, 5.5rem)',
                   fontWeight: '800',
                   lineHeight: '1.1',
                   background: 'linear-gradient(135deg, #1a202c 0%, #4a5568 100%)',
@@ -318,7 +446,7 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                 text="Supply Chain Management Forecast"
                 delay={1.2}
                 style={{
-                  fontSize: 'clamp(3rem, 8vw, 5.5rem)',
+                  fontSize: 'clamp(1.8rem, 6vw, 5.5rem)',
                   fontWeight: '800',
                   lineHeight: '1.1',
                   background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -349,7 +477,13 @@ const LandingPage = ({ onNavigateToCalculation }) => {
               style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}
             >
               <motion.button
-                onClick={onNavigateToCalculation}
+                onClick={() => {
+                  if (currentUser) {
+                    onNavigateToCalculation();
+                  } else {
+                    setShowSignInModal(true);
+                  }
+                }}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 2.6, duration: 0.6 }}
@@ -369,10 +503,12 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                   fontWeight: '600',
                   cursor: 'pointer',
                   boxShadow: '0 8px 32px rgba(102, 126, 234, 0.3)',
-                  minWidth: '180px'
+                  minWidth: '160px',
+                  width: '100%',
+                  maxWidth: '300px'
                 }}
               >
-                Start Free Trial →
+                {currentUser ? 'Go to Dashboard →' : 'Start Free Trial →'}
               </motion.button>
               
               <motion.button
@@ -395,7 +531,9 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                   fontSize: '16px',
                   fontWeight: '600',
                   cursor: 'pointer',
-                  minWidth: '180px',
+                  minWidth: '160px',
+                  width: '100%',
+                  maxWidth: '300px',
                   boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)',
                   transition: 'all 0.2s ease'
                 }}
@@ -957,9 +1095,21 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                 }}
               />
               
-              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <div style={{ 
+                display: 'flex', 
+                gap: '1rem', 
+                justifyContent: 'center', 
+                flexWrap: 'wrap',
+                padding: '0 1rem'
+              }}>
                 <motion.button
-                  onClick={onNavigateToCalculation}
+                  onClick={() => {
+                    if (currentUser) {
+                      onNavigateToCalculation();
+                    } else {
+                      setShowSignInModal(true);
+                    }
+                  }}
                   whileHover={{ scale: 1.02, y: -2 }}
                   whileTap={{ scale: 0.98 }}
                   style={{
@@ -972,10 +1122,12 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                     fontWeight: '600',
                     cursor: 'pointer',
                     minWidth: '200px',
+                    width: '100%',
+                    maxWidth: '300px',
                     boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)'
                   }}
                 >
-                  Start Free Trial →
+                  {currentUser ? 'Go to Dashboard →' : 'Start Free Trial →'}
                 </motion.button>
                 
                 <motion.button
@@ -990,7 +1142,9 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                     fontSize: '16px',
                     fontWeight: '600',
                     cursor: 'pointer',
-                    minWidth: '160px'
+                    minWidth: '160px',
+                    width: '100%',
+                    maxWidth: '300px'
                   }}
                 >
                   Contact Sales
