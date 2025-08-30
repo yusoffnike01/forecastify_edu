@@ -68,7 +68,7 @@ const ProtectedRoute = ({ children }) => {
             Please return to the home page and sign in with your account.
           </p>
           <button
-            onClick={() => window.location.href = '/'}
+            onClick={() => window.location.reload()}
             style={{
               background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
               color: 'white',
