@@ -7,7 +7,7 @@ import ForecastingParameters from '../DataInput/ForecastingParameters';
 import SalesChart from '../GraphVisualization/SalesChart';
 import ResultsDisplay from '../EducationalDisplay/ResultsDisplay';
 import { calculateForecast, combineDataForGraph, calculateStatistics, validateData } from '../../utils/calculations';
-import { getUserProducts } from '../../firebase/products';
+import { getAllProducts } from '../../firebase/products';
 import { useAuth } from '../../contexts/AuthContext';
 
 const CalculationPage = () => {
@@ -115,12 +115,12 @@ const CalculationPage = () => {
     }
     
     try {
-      const userProducts = await getUserProducts(currentUser.uid);
-      setProducts(userProducts);
+      const allProducts = await getAllProducts();
+      setProducts(allProducts);
       
       // Auto-select first product if available
-      if (userProducts.length > 0) {
-        setSelectedProduct(userProducts[0].id);
+      if (allProducts.length > 0) {
+        setSelectedProduct(allProducts[0].id);
       }
     } catch (error) {
       console.error('Error loading products:', error);
