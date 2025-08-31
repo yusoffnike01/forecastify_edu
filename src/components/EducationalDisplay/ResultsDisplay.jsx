@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const ResultsDisplay = ({ historicalData, forecastedData, statistics, selectedCurrency, formatCurrency, onExportClick, selectedProductName }) => {
+const ResultsDisplay = ({ historicalData, forecastedData, statistics, selectedCurrency, formatCurrency, onExportClick, selectedProductName, selectedCountry }) => {
   const [showCalculations, setShowCalculations] = useState(false);
 
   const handleExportClick = () => {
@@ -30,6 +30,17 @@ const ResultsDisplay = ({ historicalData, forecastedData, statistics, selectedCu
               marginBottom: '0.5rem'
             }}>
               📦 Product: <span style={{ color: '#667eea' }}>{selectedProductName}</span>
+            </div>
+          )}
+          {selectedCountry && (
+            <div style={{
+              fontSize: '1rem',
+              color: '#374151',
+              fontWeight: '600',
+              marginTop: '0.5rem',
+              marginBottom: '0.5rem'
+            }}>
+              🌍 Country/Region: <span style={{ color: '#16a34a' }}>{selectedCountry}</span>
             </div>
           )}
           {selectedCurrency && (

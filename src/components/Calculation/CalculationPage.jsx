@@ -38,6 +38,7 @@ const CalculationPage = () => {
   const [showExportModal, setShowExportModal] = useState(false);
   const [exportType, setExportType] = useState('pdf');
   const [selectedCurrency, setSelectedCurrency] = useState('MYR');
+  const [selectedCountry, setSelectedCountry] = useState('');
   const [exchangeRates, setExchangeRates] = useState({
     MYR: 1,      // Base currency (Ringgit Malaysia)
     USD: 0.22,   // 1 MYR = 0.22 USD
@@ -289,7 +290,17 @@ const CalculationPage = () => {
         pdf.setFontSize(12);
         pdf.setFont('helvetica', 'bold');
         pdf.text(`Product: ${selectedProductObj.name}`, pageWidth / 2, yPosition, { align: 'center' });
+        yPosition += 8;
+      }
+
+      // Country if selected
+      if (selectedCountry) {
+        pdf.setFontSize(12);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(`Country/Region: ${selectedCountry}`, pageWidth / 2, yPosition, { align: 'center' });
         yPosition += 12;
+      } else if (selectedProductObj) {
+        yPosition += 4; // Add some space if only product is shown
       }
 
       // Date
@@ -474,6 +485,11 @@ const CalculationPage = () => {
     if (selectedProductObj) {
       csvContent += `Product: ${selectedProductObj.name}\n`;
     }
+    
+    // Add country to Excel if selected
+    if (selectedCountry) {
+      csvContent += `Country/Region: ${selectedCountry}\n`;
+    }
     csvContent += '\n';
     csvContent += 'Year,Sales Units,Growth Rate (%)\n';
     
@@ -487,7 +503,16 @@ const CalculationPage = () => {
     
     // Sheet 2: Forecasted Data
     csvContent += 'FORECASTIFY EDU - Forecasted Sales Data\n';
-    csvContent += `Generated on: ${new Date().toLocaleDateString()}\n\n`;
+    csvContent += `Generated on: ${new Date().toLocaleDateString()}\n`;
+    
+    // Add product and country info to forecasted section too
+    if (selectedProductObj) {
+      csvContent += `Product: ${selectedProductObj.name}\n`;
+    }
+    if (selectedCountry) {
+      csvContent += `Country/Region: ${selectedCountry}\n`;
+    }
+    csvContent += '\n';
     csvContent += 'Year,Sales Units,Growth Rate (%)\n';
     
     if (results.forecastedData) {
@@ -500,7 +525,16 @@ const CalculationPage = () => {
     
     // Sheet 3: Summary Statistics
     csvContent += 'FORECASTIFY EDU - Summary Statistics\n';
-    csvContent += `Generated on: ${new Date().toLocaleDateString()}\n\n`;
+    csvContent += `Generated on: ${new Date().toLocaleDateString()}\n`;
+    
+    // Add product and country info to summary section too
+    if (selectedProductObj) {
+      csvContent += `Product: ${selectedProductObj.name}\n`;
+    }
+    if (selectedCountry) {
+      csvContent += `Country/Region: ${selectedCountry}\n`;
+    }
+    csvContent += '\n';
     csvContent += 'Metric,Value\n';
     csvContent += `Total Historical Years,${historicalData.length}\n`;
     csvContent += `Total Forecast Years,${results.forecastedData ? results.forecastedData.length : 0}\n`;
@@ -813,6 +847,8 @@ const CalculationPage = () => {
             <HistoricalDataTable 
               data={historicalData}
               onDataChange={setHistoricalData}
+              selectedCountry={selectedCountry}
+              onCountryChange={setSelectedCountry}
             />
           </motion.div>
 
@@ -1261,6 +1297,7 @@ const CalculationPage = () => {
                   selectedCurrency={selectedCurrency}
                   formatCurrency={formatCurrency}
                   selectedProductName={selectedProduct ? products.find(p => p.id === selectedProduct)?.name : null}
+                  selectedCountry={selectedCountry}
                   onExportClick={(type = 'pdf') => {
                     setExportType(type);
                     setShowExportModal(true);
