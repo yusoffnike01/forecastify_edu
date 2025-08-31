@@ -7,6 +7,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import SessionTimer from './components/SessionTimer';
 import { TypingText, FadeUpText } from './components/AnimatedText';
 import UserManagement from './components/UserManagement';
+import ProductManagement from './components/ProductManagement';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { signOutUser } from './firebase/auth';
 import './App.css';
@@ -37,7 +38,7 @@ function AppContent() {
 
   // Additional protection: prevent direct page setting without authentication
   const safeSetCurrentPage = (page) => {
-    if ((page === 'calculation' || page === 'users') && !currentUser) {
+    if ((page === 'calculation' || page === 'products' || page === 'users') && !currentUser) {
       // Force stay on home page if trying to access protected pages without auth
       setCurrentPage('home');
       return;
@@ -57,8 +58,8 @@ function AppContent() {
 
   return (
       <div className="app">
-      {/* Header - Show on calculation, users and help pages */}
-      {(currentPage === 'calculation' || currentPage === 'users' || currentPage === 'help') && (
+      {/* Header - Show on calculation, products, users and help pages */}
+      {(currentPage === 'calculation' || currentPage === 'products' || currentPage === 'users' || currentPage === 'help') && (
         <motion.header 
           className="app-header"
           initial={{ opacity: 0, y: -30, scale: 0.95 }}
@@ -146,10 +147,32 @@ function AppContent() {
               </motion.button>
 
               <motion.button
-                onClick={() => setCurrentPage('users')}
+                onClick={() => setCurrentPage('products')}
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6, duration: 0.5 }}
+                whileHover={{ scale: 1.05 }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: currentPage === 'products' ? '#1a202c' : '#4a5568',
+                  textDecoration: 'none',
+                  fontWeight: currentPage === 'products' ? '600' : '500',
+                  fontSize: '0.95rem',
+                  padding: '8px 16px',
+                  borderRadius: '8px',
+                  transition: 'all 0.3s ease',
+                  cursor: 'pointer'
+                }}
+              >
+                Products
+              </motion.button>
+
+              <motion.button
+                onClick={() => setCurrentPage('users')}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7, duration: 0.5 }}
                 whileHover={{ scale: 1.05 }}
                 style={{
                   background: 'none',
@@ -171,7 +194,7 @@ function AppContent() {
                 onClick={() => setCurrentPage('help')}
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7, duration: 0.5 }}
+                transition={{ delay: 0.8, duration: 0.5 }}
                 whileHover={{ scale: 1.05 }}
                 style={{
                   background: 'none',
@@ -203,7 +226,7 @@ function AppContent() {
                 onClick={handleLogout}
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 1.1, duration: 0.5 }}
+                transition={{ delay: 1.2, duration: 0.5 }}
                 whileHover={{ 
                   scale: 1.02, 
                   boxShadow: "0 8px 25px rgba(102, 126, 234, 0.25)"
@@ -261,7 +284,7 @@ function AppContent() {
       )}
 
       {/* Mobile Menu Overlay */}
-      {(currentPage === 'calculation' || currentPage === 'users' || currentPage === 'help') && (
+      {(currentPage === 'calculation' || currentPage === 'products' || currentPage === 'users' || currentPage === 'help') && (
         <AnimatePresence>
           {isMobileMenuOpen && (
             <motion.div
@@ -323,6 +346,28 @@ function AppContent() {
                     }}
                   >
                     📊 Forecasting
+                  </motion.button>
+
+                  <motion.button
+                    onClick={() => {
+                      setCurrentPage('products');
+                      setIsMobileMenuOpen(false);
+                    }}
+                    whileHover={{ x: 8 }}
+                    style={{
+                      width: '100%',
+                      padding: '16px 0',
+                      background: 'none',
+                      border: 'none',
+                      textAlign: 'left',
+                      fontSize: '1.1rem',
+                      fontWeight: currentPage === 'products' ? '600' : '500',
+                      color: currentPage === 'products' ? '#667eea' : '#4a5568',
+                      cursor: 'pointer',
+                      borderBottom: '1px solid #e2e8f0'
+                    }}
+                  >
+                    📦 Products
                   </motion.button>
 
                   <motion.button
@@ -407,6 +452,10 @@ function AppContent() {
             />
           ) : currentPage === 'help' ? (
             <HelpScreen key="help" />
+          ) : currentPage === 'products' ? (
+            <ProtectedRoute>
+              <ProductManagement key="products" />
+            </ProtectedRoute>
           ) : currentPage === 'users' ? (
             <ProtectedRoute>
               <UserManagement key="users" />
@@ -419,8 +468,8 @@ function AppContent() {
         </AnimatePresence>
       </main>
 
-      {/* Session Timer - Show on calculation and users pages */}
-      {(currentPage === 'calculation' || currentPage === 'users') && <SessionTimer />}
+      {/* Session Timer - Show on calculation, products and users pages */}
+      {(currentPage === 'calculation' || currentPage === 'products' || currentPage === 'users') && <SessionTimer />}
 
       </div>
   );
