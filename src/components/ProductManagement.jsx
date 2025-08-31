@@ -154,38 +154,78 @@ const ProductManagement = () => {
           transition={{ duration: 0.8, ease: "easeOut" }}
           style={{
             textAlign: 'center',
-            marginBottom: '3rem',
+            marginBottom: '2rem',
             background: 'rgba(255, 255, 255, 0.9)',
             backdropFilter: 'blur(20px)',
-            borderRadius: '24px',
-            padding: '2.5rem',
+            borderRadius: '20px',
+            padding: '2rem',
             border: '1px solid rgba(255, 255, 255, 0.2)',
             boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)'
           }}
         >
+          {/* Logo and Brand */}
           <motion.div
-            initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ delay: 0.3, duration: 0.6, type: "spring" }}
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
             style={{ 
-              fontSize: '4rem', 
-              marginBottom: '1rem',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              display: 'inline-block'
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              gap: '1rem',
+              marginBottom: '1.5rem'
             }}
           >
-            📦
+            <motion.img
+              src="/images/logoforecastifyedu.jpeg"
+              alt="Forecastify EDU"
+              initial={{ opacity: 0, rotate: -10, scale: 0.8 }}
+              animate={{ opacity: 1, rotate: 0, scale: 1 }}
+              transition={{ delay: 0.3, duration: 0.6 }}
+              style={{
+                width: '60px',
+                height: '60px',
+                objectFit: 'contain',
+                background: 'white'
+              }}
+            />
+            <div style={{ textAlign: 'left' }}>
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4, duration: 0.6 }}
+                style={{ 
+                  fontSize: '1.3rem', 
+                  fontWeight: '700',
+                  color: '#1a202c',
+                  marginBottom: '2px'
+                }}
+              >
+                FORECASTIFY EDU
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.5, duration: 0.6 }}
+                style={{
+                  fontSize: '0.7rem',
+                  color: '#4a5568',
+                  opacity: 0.9
+                }}
+              >
+                Educational Supply Chain Forecasting System
+              </motion.div>
+            </div>
           </motion.div>
+
           <motion.h1
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
             style={{
-              fontSize: 'clamp(2.5rem, 5vw, 3.5rem)',
+              fontSize: 'clamp(1.8rem, 4vw, 2.5rem)',
               fontWeight: '800',
-              marginBottom: '1rem',
+              marginBottom: '0.8rem',
               background: 'linear-gradient(135deg, #1a202c 0%, #4a5568 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -199,11 +239,11 @@ const ProductManagement = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.7 }}
             style={{
-              fontSize: '1.2rem',
+              fontSize: '1rem',
               color: '#4a5568',
-              maxWidth: '700px',
+              maxWidth: '600px',
               margin: '0 auto',
-              lineHeight: '1.6'
+              lineHeight: '1.5'
             }}
           >
             Create and manage your product collection for forecasting analysis
@@ -595,7 +635,7 @@ const ProductManagement = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
                   style={{
-                    fontSize: '1.5rem',
+                    fontSize: '1.3rem',
                     fontWeight: '700',
                     color: '#1a202c',
                     textAlign: 'center',
@@ -616,7 +656,7 @@ const ProductManagement = () => {
                   }}
                 >
                   <p style={{
-                    fontSize: '1rem',
+                    fontSize: '0.9rem',
                     color: '#4a5568',
                     lineHeight: '1.6',
                     marginBottom: '1rem'
@@ -631,6 +671,7 @@ const ProductManagement = () => {
                       border: '1px solid #e2e8f0'
                     }}>
                       <div style={{
+                        fontSize: '0.9rem',
                         fontWeight: '600',
                         color: '#2d3748',
                         marginBottom: '0.5rem'
@@ -638,7 +679,7 @@ const ProductManagement = () => {
                         {productToDelete.name}
                       </div>
                       <div style={{
-                        fontSize: '0.9rem',
+                        fontSize: '0.8rem',
                         color: '#718096'
                       }}>
                         {productToDelete.description}
@@ -646,7 +687,7 @@ const ProductManagement = () => {
                     </div>
                   )}
                   <p style={{
-                    fontSize: '0.9rem',
+                    fontSize: '0.8rem',
                     color: '#e53e3e',
                     fontWeight: '500',
                     marginTop: '1rem'
@@ -676,7 +717,7 @@ const ProductManagement = () => {
                       border: '2px solid #e2e8f0',
                       borderRadius: '12px',
                       padding: '12px 24px',
-                      fontSize: '1rem',
+                      fontSize: '0.9rem',
                       fontWeight: '600',
                       cursor: 'pointer',
                       minWidth: '100px',
@@ -707,7 +748,7 @@ const ProductManagement = () => {
                       border: 'none',
                       borderRadius: '12px',
                       padding: '12px 24px',
-                      fontSize: '1rem',
+                      fontSize: '0.9rem',
                       fontWeight: '600',
                       cursor: loading ? 'not-allowed' : 'pointer',
                       minWidth: '100px',

@@ -417,21 +417,17 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                 style={{
                   width: '120px',
                   height: '120px',
-                  borderRadius: '24px',
                   objectFit: 'contain',
-                  boxShadow: '0 20px 60px rgba(102, 126, 234, 0.3)',
-                  border: '4px solid rgba(255, 255, 255, 0.8)',
-                  background: 'rgba(255, 255, 255, 0.9)',
-                  backdropFilter: 'blur(10px)'
+                  background: 'white'
                 }}
               />
             </motion.div>
 
-            <div style={{ marginBottom: '1.5rem' }}>
+            <div style={{ marginBottom: '1.2rem' }}>
               <AnimatedText
                 text="Welcome to Fundamentals of"
                 style={{
-                  fontSize: 'clamp(1.8rem, 6vw, 5.5rem)',
+                  fontSize: 'clamp(1.5rem, 5vw, 3.8rem)',
                   fontWeight: '800',
                   lineHeight: '1.1',
                   background: 'linear-gradient(135deg, #1a202c 0%, #4a5568 100%)',
@@ -446,7 +442,7 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                 text="Supply Chain Management Forecast"
                 delay={1.2}
                 style={{
-                  fontSize: 'clamp(1.8rem, 6vw, 5.5rem)',
+                  fontSize: 'clamp(1.5rem, 5vw, 3.8rem)',
                   fontWeight: '800',
                   lineHeight: '1.1',
                   background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -458,14 +454,14 @@ const LandingPage = ({ onNavigateToCalculation }) => {
             </div>
 
             <FadeUpText
-              text="Master Supply Chain Management practices and apply forecasting techniques for planning. Built for educators, students, and professionals who want to excel in supply chain forecasting."
+              text="Complete supply chain forecasting platform with multi-currency support, product management, user administration, and advanced analytics. Built for educators, students, and professionals who demand excellence."
               delay={1.8}
               style={{
-                fontSize: '1.25rem',
+                fontSize: '1.1rem',
                 color: '#4a5568',
-                lineHeight: '1.8',
-                maxWidth: '700px',
-                margin: '0 auto 3rem',
+                lineHeight: '1.7',
+                maxWidth: '650px',
+                margin: '0 auto 2.5rem',
                 fontWeight: '400'
               }}
             />
@@ -667,13 +663,13 @@ const LandingPage = ({ onNavigateToCalculation }) => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              style={{ textAlign: 'center', marginBottom: '4rem' }}
+              style={{ textAlign: 'center', marginBottom: '3rem' }}
             >
               <div style={{ marginBottom: '1rem' }}>
                 <AnimatedText
                   text="Everything you need for"
                   style={{ 
-                    fontSize: 'clamp(2.5rem, 5vw, 3.5rem)', 
+                    fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', 
                     fontWeight: '800', 
                     color: '#1a202c',
                     lineHeight: '1.2',
@@ -685,7 +681,7 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                   text="Supply Chain Forecasting"
                   delay={1.5}
                   style={{
-                    fontSize: 'clamp(2.5rem, 5vw, 3.5rem)', 
+                    fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', 
                     fontWeight: '800',
                     lineHeight: '1.2',
                     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -695,14 +691,14 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                 />
               </div>
               <FadeUpText
-                text="Master supply chain management fundamentals with advanced forecasting techniques and educational tools"
+                text="Comprehensive platform featuring product management, multi-currency conversion, user administration, and powerful analytics for complete supply chain mastery"
                 delay={2.2}
                 style={{ 
-                  fontSize: '1.2rem', 
+                  fontSize: '1rem', 
                   color: '#4a5568', 
-                  maxWidth: '700px', 
+                  maxWidth: '600px', 
                   margin: '0 auto',
-                  lineHeight: '1.7'
+                  lineHeight: '1.6'
                 }}
               />
             </motion.div>
@@ -715,19 +711,34 @@ const LandingPage = ({ onNavigateToCalculation }) => {
             }}>
               {[
                 {
+                  icon: '📦',
+                  title: 'Product Management',
+                  description: 'Create and manage product collections with Firebase integration. Organize your inventory with streamlined name and description tracking.'
+                },
+                {
+                  icon: '💱',
+                  title: 'Multi-Currency Support',
+                  description: 'Convert forecasting results across 8 currencies with live exchange rates. Perfect for global supply chain operations and international planning.'
+                },
+                {
+                  icon: '👥',
+                  title: 'User Administration',
+                  description: 'Complete user management system with authentication, role-based access, and secure Firebase integration for educational institutions.'
+                },
+                {
                   icon: '📊',
-                  title: 'Beautiful Visualizations',
-                  description: 'Interactive charts and graphs that make complex data easy to understand and share.'
+                  title: 'Advanced Analytics',
+                  description: 'Interactive charts with mobile-responsive design, export capabilities, and detailed statistical analysis for comprehensive insights.'
                 },
                 {
-                  icon: '⚡',
-                  title: 'Real-Time Analysis',
-                  description: 'Get instant insights with our optimized calculation engine. No waiting, just results.'
+                  icon: '🎯',
+                  title: 'Professional UI',
+                  description: 'Modern, responsive interface with animated interactions, mobile optimization, and glassmorphism design elements.'
                 },
                 {
-                  icon: '🎓',
-                  title: 'Educational Focus',
-                  description: 'Supply Chain Management practices and apply forecasting techniques for planning. Perfect for fundamentals of supply chain management education.'
+                  icon: '📚',
+                  title: 'Educational Excellence',
+                  description: 'Comprehensive help documentation, step-by-step tutorials, and formula explanations designed for academic success.'
                 }
               ].map((feature, index) => (
                 <motion.div
@@ -760,17 +771,17 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                     {feature.icon}
                   </div>
                   <h3 style={{ 
-                    fontSize: '1.5rem', 
+                    fontSize: '1.3rem', 
                     fontWeight: '700', 
                     color: '#1a202c',
-                    marginBottom: '1rem'
+                    marginBottom: '0.8rem'
                   }}>
                     {feature.title}
                   </h3>
                   <p style={{ 
-                    fontSize: '1rem', 
+                    fontSize: '0.95rem', 
                     color: '#4a5568',
-                    lineHeight: '1.7',
+                    lineHeight: '1.6',
                     margin: 0
                   }}>
                     {feature.description}

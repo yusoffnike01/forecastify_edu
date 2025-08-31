@@ -275,11 +275,11 @@ const HelpScreen = () => {
           transition={{ duration: 0.8, ease: "easeOut" }}
           style={{
             textAlign: 'center',
-            marginBottom: '3rem',
+            marginBottom: '2rem',
             background: 'rgba(255, 255, 255, 0.9)',
             backdropFilter: 'blur(20px)',
-            borderRadius: '24px',
-            padding: '2.5rem',
+            borderRadius: '20px',
+            padding: '1.5rem',
             border: '1px solid rgba(255, 255, 255, 0.2)',
             boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)'
           }}
@@ -289,8 +289,8 @@ const HelpScreen = () => {
             animate={{ scale: 1, rotate: 0 }}
             transition={{ delay: 0.3, duration: 0.6, type: "spring" }}
             style={{ 
-              fontSize: '4rem', 
-              marginBottom: '1rem',
+              fontSize: '3rem', 
+              marginBottom: '0.8rem',
               background: 'linear-gradient(135deg, #059669 0%, #0d9488 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -304,9 +304,9 @@ const HelpScreen = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
             style={{
-              fontSize: 'clamp(2.5rem, 5vw, 3.5rem)',
+              fontSize: 'clamp(1.8rem, 4vw, 2.5rem)',
               fontWeight: '800',
-              marginBottom: '1rem',
+              marginBottom: '0.8rem',
               background: 'linear-gradient(135deg, #1a202c 0%, #4a5568 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -320,11 +320,11 @@ const HelpScreen = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.7 }}
             style={{
-              fontSize: '1.2rem',
+              fontSize: '1rem',
               color: '#4a5568',
-              maxWidth: '700px',
+              maxWidth: '600px',
               margin: '0 auto',
-              lineHeight: '1.6'
+              lineHeight: '1.5'
             }}
           >
             Learn how to use Forecastify EDU for supply chain forecasting and analysis
