@@ -562,36 +562,24 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                                 animate={{ opacity: 1 }}
                                 transition={{ delay: 3.6, duration: 0.8 }}
                                 style={{
-                                    background: 'linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%)',
                                     borderRadius: 'clamp(12px, 2vw, 16px)',
-                                    height: 'clamp(200px, 50vw, 400px)',
+                                    overflow: 'hidden',
                                     display: 'flex',
                                     alignItems: 'center',
-                                    justifyContent: 'center',
-                                    fontSize: 'clamp(14px, 3vw, 18px)',
-                                    color: '#4a5568',
-                                    fontWeight: '500',
-                                    textAlign: 'center',
-                                    flexDirection: 'column',
-                                    gap: '8px'
+                                    justifyContent: 'center'
                                 }}
                             >
-                                <motion.div
-                                    initial={{ scale: 0, rotate: -180 }}
-                                    animate={{ scale: 1, rotate: 0 }}
-                                    transition={{ delay: 3.8, duration: 0.6, type: "spring" }}
-                                    style={{ fontSize: '48px' }}
-                                >
-                                    📊
-                                </motion.div>
-                                <FadeUpText
-                                    text="Supply Chain Dashboard Preview"
-                                    delay={4.2}
-                                />
-                                <FadeUpText
-                                    text="Replace with actual app preview"
-                                    delay={4.4}
-                                    style={{ fontSize: '14px', opacity: 0.7 }}
+                                <img 
+                                    src="/images/Gemini_Generated_Image.png"
+                                    alt="Supply Chain Dashboard Preview"
+                                    style={{
+                                        width: '100%',
+                                        height: 'auto',
+                                        maxHeight: 'clamp(200px, 50vw, 400px)',
+                                        objectFit: 'cover',
+                                        objectPosition: 'center',
+                                        borderRadius: 'clamp(12px, 2vw, 16px)'
+                                    }}
                                 />
                             </motion.div>
                         </motion.div>
@@ -613,7 +601,7 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                         }}>
                             {[
                                 { number: '10K+', label: 'Active Users', icon: '👥' },
-                                { number: '50+', label: 'Universities', icon: '🎓' },
+                                { number: '1', label: 'Universities', icon: '🎓' },
                                 { number: '99.9%', label: 'Uptime', icon: '⚡' },
                                 { number: '4.9/5', label: 'User Rating', icon: '⭐' }
                             ].map((stat, index) => (
