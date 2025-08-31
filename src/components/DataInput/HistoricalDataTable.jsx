@@ -30,7 +30,6 @@ const HistoricalDataTable = ({ data, onDataChange }) => {
 
   return (
     <div>
-      <h3 className="section-title">📊 Historical Sales Data</h3>
 
       {/* Year Controls */}
       <div style={{ 

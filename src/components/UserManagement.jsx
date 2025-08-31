@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { signUpWithEmail } from '../firebase/auth';
+import { signUpWithEmail, deleteUserFromFirestore } from '../firebase/auth';
+import { saveUserRole, getAllRoles, deleteUserRole } from '../firebase/roles';
 import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { useAuth } from '../contexts/AuthContext';
@@ -8,6 +9,7 @@ import { useAuth } from '../contexts/AuthContext';
 const UserManagement = () => {
   const [showCreateUserModal, setShowCreateUserModal] = useState(false);
   const [users, setUsers] = useState([]);
+  const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -23,26 +25,31 @@ const UserManagement = () => {
 
   const { currentUser } = useAuth();
 
-  // Fetch all users
-  const fetchUsers = async () => {
+  // Fetch all roles
+  const fetchRoles = async () => {
     setLoading(true);
     try {
-      const usersCollection = collection(db, 'users');
-      const userSnapshot = await getDocs(usersCollection);
-      const userList = userSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      setUsers(userList);
+      const roleResult = await getAllRoles();
+      if (roleResult.success) {
+        // Convert roles object to array for display
+        const roleList = Object.entries(roleResult.roles).map(([email, data]) => ({
+          email: email,
+          role: data.role,
+          id: email // Use email as ID
+        }));
+        setRoles(roleList);
+      } else {
+        setError('Failed to fetch roles: ' + roleResult.error);
+      }
     } catch (error) {
-      setError('Failed to fetch users: ' + error.message);
+      setError('Failed to fetch roles: ' + error.message);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchUsers();
+    fetchRoles();
   }, []);
 
   const handleCreateUser = async (e) => {
@@ -52,21 +59,44 @@ const UserManagement = () => {
     setSuccess('');
 
     try {
+      // Check if user with this email already exists
+      const existingRole = roles.find(role => role.email === newUser.email);
+      if (existingRole) {
+        setError('A user with this email already exists.');
+        setIsCreating(false);
+        return;
+      }
+
+      // Create user with Firebase Authentication
       const result = await signUpWithEmail(
         newUser.email, 
         newUser.password, 
-        newUser.displayName
+        newUser.displayName || newUser.email.split('@')[0],
+        newUser.role
       );
 
       if (result.success) {
-        setSuccess(`User ${newUser.displayName} created successfully!`);
-        setNewUser({ email: '', password: '', displayName: '', role: 'student' });
-        setShowCreateUserModal(false);
-        fetchUsers(); // Refresh user list
+        console.log('User created successfully, now saving role...'); // Debug log
         
-        // Clear success message after 3 seconds
-        setTimeout(() => setSuccess(''), 3000);
+        // Save role to roles collection
+        const roleResult = await saveUserRole(newUser.email, newUser.role);
+        
+        console.log('Role save result:', roleResult); // Debug log
+        
+        if (roleResult.success) {
+          setSuccess(`User created successfully!`);
+          setNewUser({ email: '', password: '', displayName: '', role: 'student' });
+          setShowCreateUserModal(false);
+          fetchRoles(); // Refresh roles list
+          
+          // Clear success message after 3 seconds
+          setTimeout(() => setSuccess(''), 3000);
+        } else {
+          console.error('Role save failed:', roleResult.error); // Debug log
+          setError('User created but failed to save role: ' + roleResult.error);
+        }
       } else {
+        console.error('User creation failed:', result.error); // Debug log
         setError(result.error);
       }
     } catch (error) {
@@ -76,15 +106,37 @@ const UserManagement = () => {
     }
   };
 
-  const handleDeleteUser = async (userId, userName) => {
-    if (window.confirm(`Are you sure you want to delete user ${userName}?`)) {
+  const handleDeleteRole = async (email, role) => {
+    // Prevent deleting admin users
+    if (role === 'admin') {
+      setError('Cannot delete admin users');
+      setTimeout(() => setError(''), 3000);
+      return;
+    }
+
+    if (window.confirm(`Are you sure you want to delete user ${email}?`)) {
+      setLoading(true);
       try {
-        await deleteDoc(doc(db, 'users', userId));
-        setSuccess(`User ${userName} deleted successfully!`);
-        fetchUsers(); // Refresh user list
+        // Delete from roles collection
+        const roleResult = await deleteUserRole(email);
+        if (!roleResult.success) {
+          throw new Error(roleResult.error);
+        }
+
+        // Delete from users collection
+        const userResult = await deleteUserFromFirestore(email);
+        if (!userResult.success) {
+          console.warn('Failed to delete from users collection:', userResult.error);
+        }
+
+        setSuccess(`User ${email} deleted successfully!`);
+        fetchRoles(); // Refresh roles list
         setTimeout(() => setSuccess(''), 3000);
       } catch (error) {
         setError('Failed to delete user: ' + error.message);
+        setTimeout(() => setError(''), 3000);
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -125,7 +177,7 @@ const UserManagement = () => {
         </div>
 
         <motion.button
-          onClick={() => setShowCreateUserModal(true)}
+          onClick={() => setShowCreateUserModal(!showCreateUserModal)}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           style={{
@@ -140,7 +192,7 @@ const UserManagement = () => {
             boxShadow: '0 8px 25px rgba(102, 126, 234, 0.3)'
           }}
         >
-          + Create New User
+          {showCreateUserModal ? '❌ Cancel' : '➕ Create New User'}
         </motion.button>
       </div>
 
@@ -181,14 +233,21 @@ const UserManagement = () => {
         </motion.div>
       )}
 
-      {/* Users Table */}
-      <div style={{
-        background: 'rgba(248, 250, 252, 0.8)',
-        borderRadius: '16px',
-        padding: '1.5rem',
-        border: '1px solid rgba(226, 232, 240, 0.8)'
-      }}>
-        {/* Header with count and actions */}
+      {/* Roles Table */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        style={{
+          background: 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(20px)',
+          borderRadius: '20px',
+          padding: '2rem',
+          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
+          border: '1px solid rgba(255, 255, 255, 0.3)',
+          marginBottom: '2rem'
+        }}
+      >
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -204,35 +263,16 @@ const UserManagement = () => {
               color: '#1a202c',
               margin: 0
             }}>
-              Users
+              User Roles
             </h3>
             <p style={{
               fontSize: '0.9rem',
               color: '#6b7280',
               margin: '4px 0 0 0'
             }}>
-              {users.length} users • See your active users and make changes
+              {roles.length} users • Manage user roles and permissions
             </p>
           </div>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            style={{
-              background: '#f3f4f6',
-              color: '#374151',
-              border: '1px solid #d1d5db',
-              borderRadius: '8px',
-              padding: '8px 16px',
-              fontSize: '0.85rem',
-              fontWeight: '500',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px'
-            }}
-          >
-            ⬇️ Download CSV
-          </motion.button>
         </div>
 
         {loading ? (
@@ -241,9 +281,9 @@ const UserManagement = () => {
             padding: '2rem',
             color: '#4a5568' 
           }}>
-            Loading users...
+            Loading roles...
           </div>
-        ) : users.length === 0 ? (
+        ) : roles.length === 0 ? (
           <div style={{ 
             textAlign: 'center', 
             padding: '2rem',
@@ -261,57 +301,44 @@ const UserManagement = () => {
             {/* Table Header */}
             <div style={{
               display: 'grid',
-              gridTemplateColumns: '1fr 1.5fr 100px 120px 100px',
+              gridTemplateColumns: '2fr 1fr 1fr',
               background: '#f9fafb',
               borderBottom: '1px solid #e5e7eb',
               fontSize: '0.8rem',
-              fontWeight: '600',
-              color: '#374151',
+              fontWeight: '700',
+              color: '#000000',
               textTransform: 'uppercase',
               letterSpacing: '0.05em'
             }}>
-              <div style={{ padding: '12px 16px' }}>Name</div>
               <div style={{ padding: '12px 16px' }}>Email</div>
               <div style={{ padding: '12px 16px' }}>Role</div>
-              <div style={{ padding: '12px 16px' }}>Created</div>
-              <div style={{ padding: '12px 16px', textAlign: 'center' }}>Actions</div>
+              <div style={{ padding: '12px 16px' }}>Action</div>
             </div>
 
             {/* Table Rows */}
-            {users.map((user, index) => (
+            {roles.map((role, index) => (
               <motion.div
-                key={user.id}
+                key={role.id}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: '1fr 1.5fr 100px 120px 100px',
-                  borderBottom: index < users.length - 1 ? '1px solid #f3f4f6' : 'none',
-                  transition: 'background-color 0.2s ease',
-                  cursor: 'pointer'
+                  gridTemplateColumns: '2fr 1fr 1fr',
+                  borderBottom: index < roles.length - 1 ? '1px solid #f3f4f6' : 'none',
+                  transition: 'background-color 0.2s ease'
                 }}
                 whileHover={{ backgroundColor: '#f9fafb' }}
               >
                 <div style={{ 
                   padding: '16px', 
-                  display: 'flex', 
-                  alignItems: 'center',
-                  fontSize: '0.9rem',
-                  fontWeight: '500',
-                  color: '#1f2937'
-                }}>
-                  {user.displayName || 'No name'}
-                </div>
-                <div style={{ 
-                  padding: '16px', 
                   fontSize: '0.85rem',
-                  color: '#667eea',
+                  color: '#000000',
                   lineHeight: '1.4',
                   display: 'flex',
                   alignItems: 'center'
                 }}>
-                  {user.email}
+                  {role.email}
                 </div>
                 <div style={{ 
                   padding: '16px', 
@@ -321,312 +348,237 @@ const UserManagement = () => {
                   alignItems: 'center'
                 }}>
                   <span style={{
-                    background: user.role === 'admin' ? '#fef3c7' : user.role === 'lecturer' ? '#ddd6fe' : '#dcfce7',
-                    color: user.role === 'admin' ? '#92400e' : user.role === 'lecturer' ? '#5b21b6' : '#166534',
+                    background: role.role === 'admin' ? '#fef3c7' : 
+                               role.role === 'staff' ? '#ddd6fe' : 
+                               role.role === 'guest' ? '#fde68a' : '#dcfce7',
+                    color: role.role === 'admin' ? '#92400e' : 
+                           role.role === 'staff' ? '#5b21b6' : 
+                           role.role === 'guest' ? '#d97706' : '#166534',
                     padding: '2px 8px',
                     borderRadius: '12px',
                     fontSize: '0.7rem',
                     fontWeight: '500',
                     textTransform: 'capitalize'
                   }}>
-                    {user.role || 'student'}
+                    {role.role || 'student'}
                   </span>
                 </div>
                 <div style={{ 
                   padding: '16px', 
-                  fontSize: '0.8rem',
-                  color: '#9ca3af',
                   display: 'flex',
                   alignItems: 'center'
                 }}>
-                  {user.createdAt?.toDate?.()?.toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric'
-                  }) || 'N/A'}
-                </div>
-                <div style={{ 
-                  padding: '16px', 
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center'
-                }}>
-                  {user.uid !== currentUser?.uid && (
+                  {role.role !== 'admin' ? (
                     <motion.button
-                      onClick={() => handleDeleteUser(user.id, user.displayName)}
+                      onClick={() => handleDeleteRole(role.email, role.role)}
                       whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
+                      whileTap={{ scale: 0.95 }}
                       style={{
-                        background: '#ef4444',
+                        background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
                         color: 'white',
                         border: 'none',
-                        borderRadius: '6px',
                         padding: '6px 12px',
-                        fontSize: '0.7rem',
+                        borderRadius: '8px',
+                        fontSize: '0.75rem',
+                        fontWeight: '600',
                         cursor: 'pointer',
-                        fontWeight: '500'
+                        boxShadow: '0 2px 8px rgba(239, 68, 68, 0.3)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
                       }}
-                      title="Delete User"
                     >
-                      Delete
+                      🗑️ Delete
                     </motion.button>
+                  ) : (
+                    <span style={{
+                      color: '#9ca3af',
+                      fontSize: '0.75rem',
+                      fontStyle: 'italic'
+                    }}>
+                      Protected
+                    </span>
                   )}
                 </div>
               </motion.div>
             ))}
           </div>
         )}
-      </div>
+      </motion.div>
 
-      {/* Create User Modal */}
+      {/* Create User Form */}
       <AnimatePresence>
         {showCreateUserModal && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setShowCreateUserModal(false)}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
             style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: 'rgba(0, 0, 0, 0.6)',
-              backdropFilter: 'blur(8px)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 1000,
-              padding: '1rem'
+              background: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(20px)',
+              borderRadius: '24px',
+              padding: '2rem',
+              boxShadow: '0 25px 70px rgba(0, 0, 0, 0.15)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              marginTop: '2rem',
+              maxWidth: '600px',
+              margin: '2rem auto 0'
             }}
           >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              onClick={(e) => e.stopPropagation()}
-              style={{
-                background: 'white',
-                borderRadius: '24px',
-                padding: '3rem',
-                width: '100%',
-                maxWidth: '520px',
-                boxShadow: '0 25px 70px rgba(0, 0, 0, 0.15)'
-              }}
-            >
-              <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-                <h2 style={{
-                  fontSize: '1.75rem',
-                  fontWeight: '700',
+            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+              <h2 style={{
+                fontSize: '1.5rem',
+                fontWeight: '700',
+                color: '#1a202c',
+                margin: '0 0 0.5rem'
+              }}>
+                Create New User
+              </h2>
+              <p style={{
+                color: '#4a5568',
+                fontSize: '0.9rem',
+                margin: 0
+              }}>
+                Add a new user to the system
+              </p>
+            </div>
+
+            <form onSubmit={handleCreateUser}>
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '600',
                   color: '#1a202c',
-                  margin: '0 0 0.5rem'
+                  marginBottom: '0.5rem'
                 }}>
-                  Create New User
-                </h2>
-                <p style={{
-                  color: '#4a5568',
-                  fontSize: '1rem',
-                  margin: 0
-                }}>
-                  Add a new user to the system
-                </p>
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  value={newUser.email}
+                  onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+                  placeholder="Enter email address"
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    border: '2px solid #e2e8f0',
+                    borderRadius: '12px',
+                    fontSize: '16px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s ease',
+                    boxSizing: 'border-box'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                  onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
+                />
               </div>
 
-              <form onSubmit={handleCreateUser}>
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <label style={{
-                    display: 'block',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    color: '#1a202c',
-                    marginBottom: '0.5rem'
-                  }}>
-                    Full Name
-                  </label>
-                  <input
-                    type="text"
-                    value={newUser.displayName}
-                    onChange={(e) => setNewUser({...newUser, displayName: e.target.value})}
-                    placeholder="Enter full name"
-                    required
-                    style={{
-                      width: '100%',
-                      padding: '12px 16px',
-                      border: '2px solid #e2e8f0',
-                      borderRadius: '12px',
-                      fontSize: '16px',
-                      outline: 'none',
-                      transition: 'border-color 0.2s ease',
-                      boxSizing: 'border-box'
-                    }}
-                    onFocus={(e) => e.target.style.borderColor = '#667eea'}
-                    onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
-                  />
-                </div>
-
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <label style={{
-                    display: 'block',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    color: '#1a202c',
-                    marginBottom: '0.5rem'
-                  }}>
-                    Email Address
-                  </label>
-                  <input
-                    type="email"
-                    value={newUser.email}
-                    onChange={(e) => setNewUser({...newUser, email: e.target.value})}
-                    placeholder="Enter email address"
-                    required
-                    style={{
-                      width: '100%',
-                      padding: '12px 16px',
-                      border: '2px solid #e2e8f0',
-                      borderRadius: '12px',
-                      fontSize: '16px',
-                      outline: 'none',
-                      transition: 'border-color 0.2s ease',
-                      boxSizing: 'border-box'
-                    }}
-                    onFocus={(e) => e.target.style.borderColor = '#667eea'}
-                    onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
-                  />
-                </div>
-
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <label style={{
-                    display: 'block',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    color: '#1a202c',
-                    marginBottom: '0.5rem'
-                  }}>
-                    Password
-                  </label>
-                  <input
-                    type="password"
-                    value={newUser.password}
-                    onChange={(e) => setNewUser({...newUser, password: e.target.value})}
-                    placeholder="Enter password"
-                    required
-                    minLength="6"
-                    style={{
-                      width: '100%',
-                      padding: '12px 16px',
-                      border: '2px solid #e2e8f0',
-                      borderRadius: '12px',
-                      fontSize: '16px',
-                      outline: 'none',
-                      transition: 'border-color 0.2s ease',
-                      boxSizing: 'border-box'
-                    }}
-                    onFocus={(e) => e.target.style.borderColor = '#667eea'}
-                    onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
-                  />
-                </div>
-
-                <div style={{ marginBottom: '2rem' }}>
-                  <label style={{
-                    display: 'block',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    color: '#1a202c',
-                    marginBottom: '0.5rem'
-                  }}>
-                    Role
-                  </label>
-                  <select
-                    value={newUser.role}
-                    onChange={(e) => setNewUser({...newUser, role: e.target.value})}
-                    style={{
-                      width: '100%',
-                      padding: '12px 16px',
-                      border: '2px solid #e2e8f0',
-                      borderRadius: '12px',
-                      fontSize: '16px',
-                      outline: 'none',
-                      transition: 'border-color 0.2s ease',
-                      boxSizing: 'border-box',
-                      background: 'white'
-                    }}
-                    onFocus={(e) => e.target.style.borderColor = '#667eea'}
-                    onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
-                  >
-                    <option value="student">Student</option>
-                    <option value="lecturer">Lecturer</option>
-                    <option value="admin">Admin</option>
-                  </select>
-                </div>
-
-                {/* Error Message */}
-                {error && (
-                  <div style={{
-                    background: 'rgba(239, 68, 68, 0.1)',
-                    color: '#dc2626',
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#1a202c',
+                  marginBottom: '0.5rem'
+                }}>
+                  Password
+                </label>
+                <input
+                  type="password"
+                  value={newUser.password}
+                  onChange={(e) => setNewUser({...newUser, password: e.target.value})}
+                  placeholder="Enter password"
+                  required
+                  minLength="6"
+                  style={{
+                    width: '100%',
                     padding: '12px 16px',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    marginBottom: '1rem',
-                    border: '1px solid rgba(239, 68, 68, 0.2)'
-                  }}>
-                    {error}
-                  </div>
-                )}
+                    border: '2px solid #e2e8f0',
+                    borderRadius: '12px',
+                    fontSize: '16px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s ease',
+                    boxSizing: 'border-box'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                  onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
+                />
+              </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                  <motion.button
-                    type="submit"
-                    disabled={isCreating}
-                    whileHover={{ scale: isCreating ? 1 : 1.02 }}
-                    whileTap={{ scale: isCreating ? 1 : 0.98 }}
-                    style={{
-                      width: '100%',
-                      background: isCreating 
-                        ? 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)'
-                        : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                      color: 'white',
-                      border: 'none',
-                      padding: '16px',
-                      borderRadius: '12px',
-                      fontSize: '16px',
-                      fontWeight: '600',
-                      cursor: isCreating ? 'not-allowed' : 'pointer',
-                      opacity: isCreating ? 0.7 : 1
-                    }}
-                  >
-                    {isCreating ? 'Creating User...' : 'Create User'}
-                  </motion.button>
+              <div style={{ marginBottom: '2rem' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#1a202c',
+                  marginBottom: '0.5rem'
+                }}>
+                  Role
+                </label>
+                <select
+                  value={newUser.role}
+                  onChange={(e) => setNewUser({...newUser, role: e.target.value})}
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    border: '2px solid #e2e8f0',
+                    borderRadius: '12px',
+                    fontSize: '16px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s ease',
+                    boxSizing: 'border-box',
+                    background: 'white'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                  onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
+                >
+                  <option value="student">Student</option>
+                  <option value="staff">Staff</option>
+                  <option value="admin">Admin</option>
+                  <option value="guest">Guest</option>
+                </select>
+              </div>
 
-                  <motion.button
-                    type="button"
-                    onClick={() => {
-                      setShowCreateUserModal(false);
-                      setError('');
-                      setNewUser({ email: '', password: '', displayName: '', role: 'student' });
-                    }}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    style={{
-                      width: '100%',
-                      background: 'transparent',
-                      color: '#4a5568',
-                      border: '2px solid #e2e8f0',
-                      padding: '16px',
-                      borderRadius: '12px',
-                      fontSize: '16px',
-                      fontWeight: '600',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    Cancel
-                  </motion.button>
+              {/* Error Message */}
+              {error && (
+                <div style={{
+                  background: 'rgba(239, 68, 68, 0.1)',
+                  color: '#dc2626',
+                  padding: '12px 16px',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  marginBottom: '1rem',
+                  border: '1px solid rgba(239, 68, 68, 0.2)'
+                }}>
+                  {error}
                 </div>
+              )}
 
-              </form>
-            </motion.div>
+              <motion.button
+                type="submit"
+                disabled={isCreating}
+                whileHover={{ scale: isCreating ? 1 : 1.02 }}
+                whileTap={{ scale: isCreating ? 1 : 0.98 }}
+                style={{
+                  width: '100%',
+                  background: isCreating 
+                    ? 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)'
+                    : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  color: 'white',
+                  border: 'none',
+                  padding: '16px',
+                  borderRadius: '12px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  cursor: isCreating ? 'not-allowed' : 'pointer',
+                  opacity: isCreating ? 0.7 : 1
+                }}
+              >
+                {isCreating ? 'Creating User...' : 'Create User'}
+              </motion.button>
+            </form>
           </motion.div>
         )}
       </AnimatePresence>

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
-import { addProduct, getUserProducts, updateProduct, deleteProduct } from '../firebase/products';
+import { addProduct, getUserProducts, getAllProducts, updateProduct, deleteProduct } from '../firebase/products';
 
 const ProductManagement = () => {
   const { currentUser } = useAuth();
@@ -22,8 +22,17 @@ const ProductManagement = () => {
     if (!currentUser) return;
     setLoading(true);
     try {
+      // Temporarily use getAllProducts to debug
+      console.log('Current user UID:', currentUser.uid);
+      const allProducts = await getAllProducts();
+      console.log('All products from Firebase:', allProducts);
+      
+      // Also try getUserProducts to see the difference
       const userProducts = await getUserProducts(currentUser.uid);
-      setProducts(userProducts);
+      console.log('User products for current user:', userProducts);
+      
+      // For now, show all products to debug the issue
+      setProducts(allProducts);
     } catch (error) {
       console.error('Error loading products:', error);
     } finally {
@@ -534,8 +543,8 @@ const ProductManagement = () => {
                 background: '#f9fafb',
                 borderBottom: '1px solid #e5e7eb',
                 fontSize: '0.8rem',
-                fontWeight: '600',
-                color: '#374151',
+                fontWeight: '700',
+                color: '#000000',
                 textTransform: 'uppercase',
                 letterSpacing: '0.05em'
               }}>
@@ -568,14 +577,14 @@ const ProductManagement = () => {
                     alignItems: 'center',
                     fontSize: '0.9rem',
                     fontWeight: '500',
-                    color: '#1f2937'
+                    color: '#000000'
                   }}>
                     {product.name}
                   </div>
                   <div style={{ 
                     padding: '16px', 
                     fontSize: '0.85rem',
-                    color: '#6b7280',
+                    color: '#000000',
                     lineHeight: '1.4'
                   }}>
                     {product.description || 'No description'}
@@ -583,7 +592,7 @@ const ProductManagement = () => {
                   <div style={{ 
                     padding: '16px', 
                     fontSize: '0.8rem',
-                    color: '#9ca3af'
+                    color: '#000000'
                   }}>
                     {new Date(product.createdAt?.toDate ? product.createdAt.toDate() : product.createdAt).toLocaleDateString('en-US', {
                       month: 'short',

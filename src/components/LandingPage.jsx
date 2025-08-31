@@ -1299,29 +1299,28 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                             style={{
                                 background: 'white',
                                 borderRadius: '24px',
-                                padding: '3rem',
+                                padding: '2rem',
                                 width: '100%',
-                                maxWidth: '480px',
+                                maxWidth: '440px',
                                 boxShadow: '0 25px 70px rgba(0, 0, 0, 0.15)'
                             }}
                         >
-                            <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+                            <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
                                 <img
-                                    src="/images/logoforecastifyedu.jpeg"
+                                    src="/images/logoforecastifyedu-remove.png"
                                     alt="Forecastify EDU Logo"
                                     style={{
-                                        width: '60px',
-                                        height: '60px',
-                                        borderRadius: '12px',
+                                        width: '140px',
+                                        height: '140px',
                                         objectFit: 'contain',
-                                        margin: '0 auto 1.5rem'
+                                        margin: '0 auto 1rem'
                                     }}
                                 />
                                 <h2 style={{
                                     fontSize: '2rem',
                                     fontWeight: '700',
                                     color: '#1a202c',
-                                    margin: '0 0 0.5rem 0'
+                                    margin: '0 0 0.3rem 0'
                                 }}>
                                     Welcome back
                                 </h2>
@@ -1464,13 +1463,14 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                                         style={{
                                             width: '100%',
                                             background: 'transparent',
-                                            color: '#4a5568',
-                                            border: '2px solid #e2e8f0',
+                                            color: '#dc2626',
+                                            border: '2px solid #dc2626',
                                             padding: '16px',
                                             borderRadius: '12px',
                                             fontSize: '16px',
                                             fontWeight: '600',
-                                            cursor: 'pointer'
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s ease'
                                         }}
                                     >
                                         Cancel

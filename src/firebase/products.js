@@ -29,6 +29,32 @@ export const addProduct = async (productData, userId) => {
   }
 };
 
+// Get all products (for admin/debugging)
+export const getAllProducts = async () => {
+  try {
+    console.log('Fetching all products');
+    const querySnapshot = await getDocs(collection(db, COLLECTION_NAME));
+    const products = [];
+    querySnapshot.forEach((doc) => {
+      console.log('Found product:', doc.id, doc.data());
+      products.push({
+        id: doc.id,
+        ...doc.data()
+      });
+    });
+    console.log('Total products found:', products.length);
+    // Sort by createdAt in memory instead of in query
+    return products.sort((a, b) => {
+      const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
+      const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
+      return dateB - dateA;
+    });
+  } catch (error) {
+    console.error('Error getting all products:', error);
+    throw error;
+  }
+};
+
 // Get all products for a user
 export const getUserProducts = async (userId) => {
   try {

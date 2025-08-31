@@ -129,6 +129,11 @@ const CalculationPage = () => {
     }
   };
 
+  // Handle product selection
+  const handleProductSelect = (e) => {
+    setSelectedProduct(e.target.value);
+  };
+
   // Fetch exchange rates on component mount
   useEffect(() => {
     fetchExchangeRates();
@@ -245,23 +250,52 @@ const CalculationPage = () => {
       const pageHeight = pdf.internal.pageSize.getHeight();
       const margin = 20;
       const contentWidth = pageWidth - (2 * margin);
-      let yPosition = 30;
+      let yPosition = 15;
+
+      // Add logo to PDF
+      try {
+        const logoResponse = await fetch('/images/logoforecastifyedu-remove.png');
+        const logoBlob = await logoResponse.blob();
+        const logoDataUrl = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.readAsDataURL(logoBlob);
+        });
+        
+        // Add logo image
+        const logoWidth = 30;
+        const logoHeight = 30;
+        const logoX = (pageWidth - logoWidth) / 2;
+        pdf.addImage(logoDataUrl, 'PNG', logoX, yPosition, logoWidth, logoHeight);
+        yPosition += 38;
+      } catch (error) {
+        console.warn('Failed to add logo to PDF:', error);
+      }
 
       // Header
       pdf.setFontSize(20);
       pdf.setFont('helvetica', 'bold');
       pdf.text('FORECASTIFY EDU', pageWidth / 2, yPosition, { align: 'center' });
-      yPosition += 10;
+      yPosition += 8;
       
       pdf.setFontSize(14);
       pdf.setFont('helvetica', 'normal');
       pdf.text('Educational Sales Forecasting Report', pageWidth / 2, yPosition, { align: 'center' });
-      yPosition += 20;
+      yPosition += 12;
+
+      // Product name if selected
+      const selectedProductObj = selectedProduct ? products.find(p => p.id === selectedProduct) : null;
+      if (selectedProductObj) {
+        pdf.setFontSize(12);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(`Product: ${selectedProductObj.name}`, pageWidth / 2, yPosition, { align: 'center' });
+        yPosition += 12;
+      }
 
       // Date
       pdf.setFontSize(10);
       pdf.text(`Generated on: ${new Date().toLocaleDateString()}`, margin, yPosition);
-      yPosition += 15;
+      yPosition += 12;
 
       // Historical Data Table
       pdf.setFontSize(16);
@@ -353,7 +387,7 @@ const CalculationPage = () => {
 
       // Add second page with graph
       pdf.addPage();
-      yPosition = 30;
+      yPosition = 15;
 
       // Graph Section on Page 2
       pdf.setFontSize(16);
@@ -433,7 +467,14 @@ const CalculationPage = () => {
     
     // Sheet 1: Historical Data
     csvContent += 'FORECASTIFY EDU - Historical Sales Data\n';
-    csvContent += `Generated on: ${new Date().toLocaleDateString()}\n\n`;
+    csvContent += `Generated on: ${new Date().toLocaleDateString()}\n`;
+    
+    // Add product name to Excel if selected
+    const selectedProductObj = selectedProduct ? products.find(p => p.id === selectedProduct) : null;
+    if (selectedProductObj) {
+      csvContent += `Product: ${selectedProductObj.name}\n`;
+    }
+    csvContent += '\n';
     csvContent += 'Year,Sales Units,Growth Rate (%)\n';
     
     const { growthRates = [] } = results.statistics;
@@ -601,102 +642,66 @@ const CalculationPage = () => {
             border: '1px solid rgba(255, 255, 255, 0.3)'
           }}
         >
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '1.5rem',
-            flexWrap: 'wrap'
-          }}>
-            {/* Product Selection */}
-            <div style={{ flex: '1', minWidth: '250px' }}>
-              <label style={{
-                display: 'block',
-                fontSize: '1rem',
-                fontWeight: '600',
-                color: '#1a202c',
-                marginBottom: '0.8rem'
+          {/* Product Selection */}
+          <div style={{ maxWidth: '100%' }}>
+            <label style={{
+              display: 'block',
+              fontSize: '1rem',
+              fontWeight: '600',
+              color: '#1a202c',
+              marginBottom: '0.8rem'
+            }}>
+              📦 Select Product for Forecasting
+            </label>
+            {loadingProducts ? (
+              <div style={{
+                padding: '12px 16px',
+                background: '#f3f4f6',
+                border: '1px solid #d1d5db',
+                borderRadius: '12px',
+                fontSize: '14px',
+                color: '#6b7280'
               }}>
-                📦 Select Product for Forecasting
-              </label>
-              {loadingProducts ? (
-                <div style={{
+                Loading products...
+              </div>
+            ) : products.length === 0 ? (
+              <div style={{
+                padding: '12px 16px',
+                background: '#fef3c7',
+                border: '1px solid #fbbf24',
+                borderRadius: '12px',
+                fontSize: '14px',
+                color: '#92400e'
+              }}>
+                No products found. Please create a product first in the Products section.
+              </div>
+            ) : (
+              <select
+                value={selectedProduct}
+                onChange={handleProductSelect}
+                style={{
+                  width: '100%',
                   padding: '12px 16px',
-                  background: '#f3f4f6',
-                  border: '1px solid #d1d5db',
+                  border: '2px solid #e2e8f0',
                   borderRadius: '12px',
-                  fontSize: '14px',
-                  color: '#6b7280'
-                }}>
-                  Loading products...
-                </div>
-              ) : products.length === 0 ? (
-                <div style={{
-                  padding: '12px 16px',
-                  background: '#fef3c7',
-                  border: '1px solid #fbbf24',
-                  borderRadius: '12px',
-                  fontSize: '14px',
-                  color: '#92400e'
-                }}>
-                  No products found. Please create a product first in the Products section.
-                </div>
-              ) : (
-                <select
-                  value={selectedProduct}
-                  onChange={(e) => setSelectedProduct(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '12px 16px',
-                    border: '2px solid #e2e8f0',
-                    borderRadius: '12px',
-                    fontSize: '16px',
-                    outline: 'none',
-                    transition: 'border-color 0.2s ease',
-                    background: 'white',
-                    fontFamily: 'inherit'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#667eea'}
-                  onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
-                >
-                  <option value="">Select a product...</option>
-                  {products.map((product) => (
-                    <option key={product.id} value={product.id}>
-                      {product.name}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </div>
-
-            {/* Calculate Button */}
-            <motion.button
-              onClick={handleCalculate}
-              disabled={isCalculating || !selectedProduct || products.length === 0}
-              whileHover={!isCalculating && selectedProduct ? { scale: 1.05 } : {}}
-              whileTap={!isCalculating && selectedProduct ? { scale: 0.95 } : {}}
-              style={{
-                background: (!selectedProduct || products.length === 0) 
-                  ? 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)'
-                  : isCalculating 
-                    ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
-                    : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                color: 'white',
-                border: 'none',
-                borderRadius: '16px',
-                padding: '16px 32px',
-                fontSize: '1.1rem',
-                fontWeight: '600',
-                cursor: (!selectedProduct || products.length === 0 || isCalculating) ? 'not-allowed' : 'pointer',
-                boxShadow: (!selectedProduct || products.length === 0) 
-                  ? '0 4px 15px rgba(156, 163, 175, 0.3)'
-                  : '0 8px 25px rgba(16, 185, 129, 0.3)',
-                transition: 'all 0.3s ease',
-                minWidth: '160px'
-              }}
-            >
-              {isCalculating ? '⏳ Calculating...' : '🚀 Calculate Forecast'}
-            </motion.button>
+                  fontSize: '16px',
+                  outline: 'none',
+                  transition: 'border-color 0.2s ease',
+                  background: 'white',
+                  fontFamily: 'inherit',
+                  cursor: 'pointer'
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
+              >
+                <option value="">Select a product...</option>
+                {products.map((product) => (
+                  <option key={product.id} value={product.id}>
+                    {product.name} {product.description ? `- ${product.description}` : ''}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
 
           {/* Selected Product Info */}
@@ -1255,6 +1260,7 @@ const CalculationPage = () => {
                   statistics={results.statistics}
                   selectedCurrency={selectedCurrency}
                   formatCurrency={formatCurrency}
+                  selectedProductName={selectedProduct ? products.find(p => p.id === selectedProduct)?.name : null}
                   onExportClick={(type = 'pdf') => {
                     setExportType(type);
                     setShowExportModal(true);

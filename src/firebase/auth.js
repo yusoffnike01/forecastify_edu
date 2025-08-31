@@ -6,13 +6,14 @@ import {
   updateProfile,
   GoogleAuthProvider,
   signInWithPopup,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  deleteUser
 } from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, deleteDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { auth, db } from './config';
 
 // Sign up with email and password
-export const signUpWithEmail = async (email, password, displayName) => {
+export const signUpWithEmail = async (email, password, displayName, role = 'student') => {
   try {
     const result = await createUserWithEmailAndPassword(auth, email, password);
     const user = result.user;
@@ -27,10 +28,9 @@ export const signUpWithEmail = async (email, password, displayName) => {
       uid: user.uid,
       email: user.email,
       displayName: displayName,
-      role: 'student', // Default role
+      role: role, // Use the provided role
       institution: 'Politeknik Tuanku Sultanah Bahiyah',
-      createdAt: new Date(),
-      lastLoginAt: new Date()
+      createdAt: new Date()
     });
     
     return { success: true, user };
@@ -44,11 +44,6 @@ export const signInWithEmail = async (email, password) => {
   try {
     const result = await signInWithEmailAndPassword(auth, email, password);
     const user = result.user;
-    
-    // Update last login time
-    await setDoc(doc(db, 'users', user.uid), {
-      lastLoginAt: new Date()
-    }, { merge: true });
     
     return { success: true, user };
   } catch (error) {
@@ -73,14 +68,8 @@ export const signInWithGoogle = async () => {
         photoURL: user.photoURL,
         role: 'student',
         institution: 'Politeknik Tuanku Sultanah Bahiyah',
-        createdAt: new Date(),
-        lastLoginAt: new Date()
+        createdAt: new Date()
       });
-    } else {
-      // Update last login time
-      await setDoc(doc(db, 'users', user.uid), {
-        lastLoginAt: new Date()
-      }, { merge: true });
     }
     
     return { success: true, user };
@@ -119,6 +108,32 @@ export const getCurrentUserData = async (uid) => {
       return { success: false, error: 'User data not found' };
     }
   } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+// Delete user from users collection by email
+export const deleteUserFromFirestore = async (email) => {
+  try {
+    console.log('Deleting user from Firestore:', email); // Debug log
+    
+    // Query users collection to find user by email
+    const usersCollection = collection(db, 'users');
+    const q = query(usersCollection, where('email', '==', email));
+    const querySnapshot = await getDocs(q);
+    
+    // Delete all matching user documents
+    const deletePromises = querySnapshot.docs.map(userDoc => 
+      deleteDoc(doc(db, 'users', userDoc.id))
+    );
+    
+    await Promise.all(deletePromises);
+    
+    console.log('User deleted from Firestore successfully'); // Debug log
+    
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting user from Firestore:', error); // Debug log
     return { success: false, error: error.message };
   }
 };
