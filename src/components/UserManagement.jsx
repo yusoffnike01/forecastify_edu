@@ -13,6 +13,7 @@ const UserManagement = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   
   // Form states
   const [newUser, setNewUser] = useState({
@@ -24,6 +25,15 @@ const UserManagement = () => {
   const [isCreating, setIsCreating] = useState(false);
 
   const { currentUser } = useAuth();
+
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Fetch all roles
   const fetchRoles = async () => {
@@ -146,21 +156,23 @@ const UserManagement = () => {
       background: 'rgba(255, 255, 255, 0.95)',
       backdropFilter: 'blur(20px)',
       borderRadius: '24px',
-      padding: '2rem',
+      padding: isMobile ? '1rem' : '2rem',
       boxShadow: '0 25px 70px rgba(0, 0, 0, 0.15)',
       border: '1px solid rgba(255, 255, 255, 0.3)',
-      marginBottom: '2rem'
+      margin: isMobile ? '0.5rem 0.5rem 2rem 0.5rem' : '0 0 2rem 0'
     }}>
       {/* Header */}
       <div style={{ 
         display: 'flex', 
         justifyContent: 'space-between', 
-        alignItems: 'center', 
-        marginBottom: '2rem' 
+        alignItems: isMobile ? 'flex-start' : 'center', 
+        marginBottom: isMobile ? '1.5rem' : '2rem',
+        flexDirection: isMobile ? 'column' : 'row',
+        gap: isMobile ? '1rem' : '0'
       }}>
         <div>
           <h2 style={{
-            fontSize: '1.75rem',
+            fontSize: isMobile ? '1.5rem' : '1.75rem',
             fontWeight: '700',
             color: '#1a202c',
             margin: '0 0 0.5rem'
@@ -169,7 +181,7 @@ const UserManagement = () => {
           </h2>
           <p style={{
             color: '#4a5568',
-            fontSize: '1rem',
+            fontSize: isMobile ? '0.9rem' : '1rem',
             margin: 0
           }}>
             Create and manage system users
@@ -184,12 +196,14 @@ const UserManagement = () => {
             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             color: 'white',
             border: 'none',
-            padding: '12px 24px',
+            padding: isMobile ? '10px 16px' : '12px 24px',
             borderRadius: '12px',
-            fontSize: '16px',
+            fontSize: isMobile ? '14px' : '16px',
             fontWeight: '600',
             cursor: 'pointer',
-            boxShadow: '0 8px 25px rgba(102, 126, 234, 0.3)'
+            boxShadow: '0 8px 25px rgba(102, 126, 234, 0.3)',
+            width: isMobile ? '100%' : 'auto',
+            textAlign: 'center'
           }}
         >
           {showCreateUserModal ? '❌ Cancel' : '➕ Create New User'}
@@ -242,10 +256,11 @@ const UserManagement = () => {
           background: 'rgba(255, 255, 255, 0.95)',
           backdropFilter: 'blur(20px)',
           borderRadius: '20px',
-          padding: '2rem',
+          padding: isMobile ? '1.5rem' : '2rem',
           boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
           border: '1px solid rgba(255, 255, 255, 0.3)',
-          marginBottom: '2rem'
+          marginTop: isMobile ? '1rem' : '1.5rem',
+          marginBottom: isMobile ? '1rem' : '2rem'
         }}
       >
         <div style={{
@@ -298,109 +313,214 @@ const UserManagement = () => {
             overflow: 'hidden',
             background: 'white'
           }}>
-            {/* Table Header */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: '2fr 1fr 1fr',
-              background: '#f9fafb',
-              borderBottom: '1px solid #e5e7eb',
-              fontSize: '0.8rem',
-              fontWeight: '700',
-              color: '#000000',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em'
-            }}>
-              <div style={{ padding: '12px 16px' }}>Email</div>
-              <div style={{ padding: '12px 16px' }}>Role</div>
-              <div style={{ padding: '12px 16px' }}>Action</div>
-            </div>
+            {/* Table Header - Hide on mobile */}
+            {!isMobile && (
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '2fr 1fr 1fr',
+                background: '#f9fafb',
+                borderBottom: '1px solid #e5e7eb',
+                fontSize: '0.8rem',
+                fontWeight: '700',
+                color: '#000000',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em'
+              }}>
+                <div style={{ padding: '12px 16px' }}>Email</div>
+                <div style={{ padding: '12px 16px' }}>Role</div>
+                <div style={{ padding: '12px 16px' }}>Action</div>
+              </div>
+            )}
 
             {/* Table Rows */}
             {roles.map((role, index) => (
-              <motion.div
-                key={role.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.05 }}
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '2fr 1fr 1fr',
-                  borderBottom: index < roles.length - 1 ? '1px solid #f3f4f6' : 'none',
-                  transition: 'background-color 0.2s ease'
-                }}
-                whileHover={{ backgroundColor: '#f9fafb' }}
-              >
-                <div style={{ 
-                  padding: '16px', 
-                  fontSize: '0.85rem',
-                  color: '#000000',
-                  lineHeight: '1.4',
-                  display: 'flex',
-                  alignItems: 'center'
-                }}>
-                  {role.email}
-                </div>
-                <div style={{ 
-                  padding: '16px', 
-                  fontSize: '0.8rem',
-                  color: '#6b7280',
-                  display: 'flex',
-                  alignItems: 'center'
-                }}>
-                  <span style={{
-                    background: role.role === 'admin' ? '#fef3c7' : 
-                               role.role === 'staff' ? '#ddd6fe' : 
-                               role.role === 'guest' ? '#fde68a' : '#dcfce7',
-                    color: role.role === 'admin' ? '#92400e' : 
-                           role.role === 'staff' ? '#5b21b6' : 
-                           role.role === 'guest' ? '#d97706' : '#166534',
-                    padding: '2px 8px',
-                    borderRadius: '12px',
-                    fontSize: '0.7rem',
-                    fontWeight: '500',
-                    textTransform: 'capitalize'
+              isMobile ? (
+                // Mobile Card Layout
+                <motion.div
+                  key={role.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  style={{
+                    padding: '16px',
+                    borderBottom: index < roles.length - 1 ? '1px solid #f3f4f6' : 'none',
+                    background: 'white'
+                  }}
+                >
+                  <div style={{ marginBottom: '12px' }}>
+                    <div style={{ 
+                      fontSize: '0.75rem',
+                      fontWeight: '600',
+                      color: '#6b7280',
+                      textTransform: 'uppercase',
+                      marginBottom: '4px'
+                    }}>
+                      Email
+                    </div>
+                    <div style={{ 
+                      fontSize: '0.85rem',
+                      color: '#000000',
+                      wordBreak: 'break-all'
+                    }}>
+                      {role.email}
+                    </div>
+                  </div>
+                  
+                  <div style={{ 
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginTop: '12px'
                   }}>
-                    {role.role || 'student'}
-                  </span>
-                </div>
-                <div style={{ 
-                  padding: '16px', 
-                  display: 'flex',
-                  alignItems: 'center'
-                }}>
-                  {role.role !== 'admin' ? (
-                    <motion.button
-                      onClick={() => handleDeleteRole(role.email, role.role)}
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                      style={{
-                        background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-                        color: 'white',
-                        border: 'none',
-                        padding: '6px 12px',
-                        borderRadius: '8px',
+                    <div>
+                      <div style={{ 
                         fontSize: '0.75rem',
                         fontWeight: '600',
-                        cursor: 'pointer',
-                        boxShadow: '0 2px 8px rgba(239, 68, 68, 0.3)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px'
-                      }}
-                    >
-                      🗑️ Delete
-                    </motion.button>
-                  ) : (
+                        color: '#6b7280',
+                        textTransform: 'uppercase',
+                        marginBottom: '4px'
+                      }}>
+                        Role
+                      </div>
+                      <span style={{
+                        background: role.role === 'admin' ? '#fef3c7' : 
+                                   role.role === 'staff' ? '#ddd6fe' : 
+                                   role.role === 'guest' ? '#fde68a' : '#dcfce7',
+                        color: role.role === 'admin' ? '#92400e' : 
+                               role.role === 'staff' ? '#5b21b6' : 
+                               role.role === 'guest' ? '#d97706' : '#166534',
+                        padding: '4px 8px',
+                        borderRadius: '12px',
+                        fontSize: '0.75rem',
+                        fontWeight: '500',
+                        textTransform: 'capitalize'
+                      }}>
+                        {role.role || 'student'}
+                      </span>
+                    </div>
+                    
+                    <div>
+                      {role.role !== 'admin' ? (
+                        <motion.button
+                          onClick={() => handleDeleteRole(role.email, role.role)}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          style={{
+                            background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                            color: 'white',
+                            border: 'none',
+                            padding: '6px 12px',
+                            borderRadius: '8px',
+                            fontSize: '0.75rem',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            boxShadow: '0 2px 8px rgba(239, 68, 68, 0.3)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}
+                        >
+                          🗑️ Delete
+                        </motion.button>
+                      ) : (
+                        <span style={{
+                          color: '#9ca3af',
+                          fontSize: '0.75rem',
+                          fontStyle: 'italic'
+                        }}>
+                          Protected
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              ) : (
+                // Desktop Table Layout
+                <motion.div
+                  key={role.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '2fr 1fr 1fr',
+                    borderBottom: index < roles.length - 1 ? '1px solid #f3f4f6' : 'none',
+                    transition: 'background-color 0.2s ease'
+                  }}
+                  whileHover={{ backgroundColor: '#f9fafb' }}
+                >
+                  <div style={{ 
+                    padding: '16px', 
+                    fontSize: '0.85rem',
+                    color: '#000000',
+                    lineHeight: '1.4',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
+                    {role.email}
+                  </div>
+                  <div style={{ 
+                    padding: '16px', 
+                    fontSize: '0.8rem',
+                    color: '#6b7280',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
                     <span style={{
-                      color: '#9ca3af',
-                      fontSize: '0.75rem',
-                      fontStyle: 'italic'
+                      background: role.role === 'admin' ? '#fef3c7' : 
+                                 role.role === 'staff' ? '#ddd6fe' : 
+                                 role.role === 'guest' ? '#fde68a' : '#dcfce7',
+                      color: role.role === 'admin' ? '#92400e' : 
+                             role.role === 'staff' ? '#5b21b6' : 
+                             role.role === 'guest' ? '#d97706' : '#166534',
+                      padding: '2px 8px',
+                      borderRadius: '12px',
+                      fontSize: '0.7rem',
+                      fontWeight: '500',
+                      textTransform: 'capitalize'
                     }}>
-                      Protected
+                      {role.role || 'student'}
                     </span>
-                  )}
-                </div>
-              </motion.div>
+                  </div>
+                  <div style={{ 
+                    padding: '16px', 
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
+                    {role.role !== 'admin' ? (
+                      <motion.button
+                        onClick={() => handleDeleteRole(role.email, role.role)}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                        style={{
+                          background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                          color: 'white',
+                          border: 'none',
+                          padding: '6px 12px',
+                          borderRadius: '8px',
+                          fontSize: '0.75rem',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          boxShadow: '0 2px 8px rgba(239, 68, 68, 0.3)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
+                      >
+                        🗑️ Delete
+                      </motion.button>
+                    ) : (
+                      <span style={{
+                        color: '#9ca3af',
+                        fontSize: '0.75rem',
+                        fontStyle: 'italic'
+                      }}>
+                        Protected
+                      </span>
+                    )}
+                  </div>
+                </motion.div>
+              )
             ))}
           </div>
         )}
@@ -417,17 +537,21 @@ const UserManagement = () => {
               background: 'rgba(255, 255, 255, 0.95)',
               backdropFilter: 'blur(20px)',
               borderRadius: '24px',
-              padding: '2rem',
+              padding: isMobile ? '1.5rem' : '2rem',
               boxShadow: '0 25px 70px rgba(0, 0, 0, 0.15)',
               border: '1px solid rgba(255, 255, 255, 0.3)',
-              marginTop: '2rem',
-              maxWidth: '600px',
-              margin: '2rem auto 0'
+              marginTop: isMobile ? '1rem' : '2rem',
+              maxWidth: isMobile ? '100%' : '600px',
+              margin: isMobile ? '1rem 0 0' : '2rem auto 0',
+              width: isMobile ? 'calc(100% - 1rem)' : 'auto'
             }}
           >
-            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+            <div style={{ 
+              textAlign: 'center', 
+              marginBottom: isMobile ? '1.5rem' : '2rem' 
+            }}>
               <h2 style={{
-                fontSize: '1.5rem',
+                fontSize: isMobile ? '1.25rem' : '1.5rem',
                 fontWeight: '700',
                 color: '#1a202c',
                 margin: '0 0 0.5rem'
@@ -436,7 +560,7 @@ const UserManagement = () => {
               </h2>
               <p style={{
                 color: '#4a5568',
-                fontSize: '0.9rem',
+                fontSize: isMobile ? '0.85rem' : '0.9rem',
                 margin: 0
               }}>
                 Add a new user to the system

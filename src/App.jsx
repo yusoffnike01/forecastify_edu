@@ -10,12 +10,35 @@ import UserManagement from './components/UserManagement';
 import ProductManagement from './components/ProductManagement';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { signOutUser } from './firebase/auth';
+import { getUserRole } from './firebase/roles';
 import './App.css';
 
 function AppContent() {
   const [currentPage, setCurrentPage] = useState('home');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [userRole, setUserRole] = useState('student');
   const { currentUser } = useAuth();
+
+  // Fetch user role when user changes
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      if (currentUser?.email) {
+        try {
+          const result = await getUserRole(currentUser.email);
+          if (result.success) {
+            setUserRole(result.role);
+          }
+        } catch (error) {
+          console.error('Error fetching user role:', error);
+          setUserRole('student'); // Default to student on error
+        }
+      } else {
+        setUserRole('student'); // Default for no user
+      }
+    };
+    
+    fetchUserRole();
+  }, [currentUser]);
 
   // Auto-redirect authenticated users to calculation page
   useEffect(() => {
@@ -25,6 +48,13 @@ function AppContent() {
       setCurrentPage('home');
     }
   }, [currentUser]);
+
+  // Redirect non-admin users away from admin pages
+  useEffect(() => {
+    if (userRole !== 'admin' && (currentPage === 'products' || currentPage === 'users')) {
+      setCurrentPage('calculation');
+    }
+  }, [userRole, currentPage]);
 
   // Navigation handler with authentication check
   const handleNavigateToCalculation = () => {
@@ -36,13 +66,21 @@ function AppContent() {
     setCurrentPage('calculation');
   };
 
-  // Additional protection: prevent direct page setting without authentication
+  // Additional protection: prevent direct page setting without authentication or proper role
   const safeSetCurrentPage = (page) => {
     if ((page === 'calculation' || page === 'products' || page === 'users') && !currentUser) {
       // Force stay on home page if trying to access protected pages without auth
       setCurrentPage('home');
       return;
     }
+    
+    // Additional check for admin-only pages
+    if ((page === 'products' || page === 'users') && userRole !== 'admin') {
+      // Redirect non-admin users to calculation page
+      setCurrentPage('calculation');
+      return;
+    }
+    
     setCurrentPage(page);
   };
 
@@ -146,49 +184,53 @@ function AppContent() {
                 Forecasting
               </motion.button>
 
-              <motion.button
-                onClick={() => setCurrentPage('products')}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6, duration: 0.5 }}
-                whileHover={{ scale: 1.05 }}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: currentPage === 'products' ? '#1a202c' : '#4a5568',
-                  textDecoration: 'none',
-                  fontWeight: currentPage === 'products' ? '600' : '500',
-                  fontSize: '0.95rem',
-                  padding: '8px 16px',
-                  borderRadius: '8px',
-                  transition: 'all 0.3s ease',
-                  cursor: 'pointer'
-                }}
-              >
-                Products
-              </motion.button>
+              {userRole === 'admin' && (
+                <motion.button
+                  onClick={() => setCurrentPage('products')}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6, duration: 0.5 }}
+                  whileHover={{ scale: 1.05 }}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: currentPage === 'products' ? '#1a202c' : '#4a5568',
+                    textDecoration: 'none',
+                    fontWeight: currentPage === 'products' ? '600' : '500',
+                    fontSize: '0.95rem',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    transition: 'all 0.3s ease',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Products
+                </motion.button>
+              )}
 
-              <motion.button
-                onClick={() => setCurrentPage('users')}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7, duration: 0.5 }}
-                whileHover={{ scale: 1.05 }}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: currentPage === 'users' ? '#1a202c' : '#4a5568',
-                  textDecoration: 'none',
-                  fontWeight: currentPage === 'users' ? '600' : '500',
-                  fontSize: '0.95rem',
-                  padding: '8px 16px',
-                  borderRadius: '8px',
-                  transition: 'all 0.3s ease',
-                  cursor: 'pointer'
-                }}
-              >
-                User Management
-              </motion.button>
+              {userRole === 'admin' && (
+                <motion.button
+                  onClick={() => setCurrentPage('users')}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.7, duration: 0.5 }}
+                  whileHover={{ scale: 1.05 }}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: currentPage === 'users' ? '#1a202c' : '#4a5568',
+                    textDecoration: 'none',
+                    fontWeight: currentPage === 'users' ? '600' : '500',
+                    fontSize: '0.95rem',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    transition: 'all 0.3s ease',
+                    cursor: 'pointer'
+                  }}
+                >
+                  User Management
+                </motion.button>
+              )}
 
               <motion.button
                 onClick={() => setCurrentPage('help')}
@@ -348,49 +390,53 @@ function AppContent() {
                     📊 Forecasting
                   </motion.button>
 
-                  <motion.button
-                    onClick={() => {
-                      setCurrentPage('products');
-                      setIsMobileMenuOpen(false);
-                    }}
-                    whileHover={{ x: 8 }}
-                    style={{
-                      width: '100%',
-                      padding: '16px 0',
-                      background: 'none',
-                      border: 'none',
-                      textAlign: 'left',
-                      fontSize: '1.1rem',
-                      fontWeight: currentPage === 'products' ? '600' : '500',
-                      color: currentPage === 'products' ? '#667eea' : '#4a5568',
-                      cursor: 'pointer',
-                      borderBottom: '1px solid #e2e8f0'
-                    }}
-                  >
-                    📦 Products
-                  </motion.button>
+                  {userRole === 'admin' && (
+                    <motion.button
+                      onClick={() => {
+                        setCurrentPage('products');
+                        setIsMobileMenuOpen(false);
+                      }}
+                      whileHover={{ x: 8 }}
+                      style={{
+                        width: '100%',
+                        padding: '16px 0',
+                        background: 'none',
+                        border: 'none',
+                        textAlign: 'left',
+                        fontSize: '1.1rem',
+                        fontWeight: currentPage === 'products' ? '600' : '500',
+                        color: currentPage === 'products' ? '#667eea' : '#4a5568',
+                        cursor: 'pointer',
+                        borderBottom: '1px solid #e2e8f0'
+                      }}
+                    >
+                      📦 Products
+                    </motion.button>
+                  )}
 
-                  <motion.button
-                    onClick={() => {
-                      setCurrentPage('users');
-                      setIsMobileMenuOpen(false);
-                    }}
-                    whileHover={{ x: 8 }}
-                    style={{
-                      width: '100%',
-                      padding: '16px 0',
-                      background: 'none',
-                      border: 'none',
-                      textAlign: 'left',
-                      fontSize: '1.1rem',
-                      fontWeight: currentPage === 'users' ? '600' : '500',
-                      color: currentPage === 'users' ? '#667eea' : '#4a5568',
-                      cursor: 'pointer',
-                      borderBottom: '1px solid #e2e8f0'
-                    }}
-                  >
-                    👥 User Management
-                  </motion.button>
+                  {userRole === 'admin' && (
+                    <motion.button
+                      onClick={() => {
+                        setCurrentPage('users');
+                        setIsMobileMenuOpen(false);
+                      }}
+                      whileHover={{ x: 8 }}
+                      style={{
+                        width: '100%',
+                        padding: '16px 0',
+                        background: 'none',
+                        border: 'none',
+                        textAlign: 'left',
+                        fontSize: '1.1rem',
+                        fontWeight: currentPage === 'users' ? '600' : '500',
+                        color: currentPage === 'users' ? '#667eea' : '#4a5568',
+                        cursor: 'pointer',
+                        borderBottom: '1px solid #e2e8f0'
+                      }}
+                    >
+                      👥 User Management
+                    </motion.button>
+                  )}
 
                   <motion.button
                     onClick={() => {
