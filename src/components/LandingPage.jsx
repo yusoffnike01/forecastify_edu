@@ -953,22 +953,22 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                                     name: 'Sharipah Khadijah Binti S.Hashim',
                                     title: 'Principal Lecturer',
                                     specialization: 'Commerce Department',
-                                    avatar: '👩‍🎓',
+                                    image: '/images/sharifah.jpeg',
                                     email: 'sharipahkhadijah@ptsb.edu.my',
                                     description: 'Principal Lecturer in Commerce Department, with extensive research experience in Supply Chain Management and multiple fields.'
                                 },
                                 {
-                                    name: 'Puan Shafiqah',
+                                    name: 'Farizoh Binti Hamid',
                                     title: 'Senior Lecturer',
                                     specialization: 'Supply Chain Management & Forecasting',
-                                    avatar: '👩‍🏫',
+                                    image: '/images/farizo.jpeg',
                                     description: 'Expert in supply chain fundamentals with over 10 years of experience in educational leadership.'
                                 },
                                 {
                                     name: 'Abdul Aziz Bin Ishak',
                                     title: 'Senior Lecturer',
                                     specialization: 'Commerce Department',
-                                    avatar: '👨‍🎓',
+                                    image: '/images/aziz.jpeg',
                                     email: 'abaziz@ptsb.edu.my',
                                     description: 'Senior Lecturer in Commerce Department, with extensive research experience in Logistics, Distribution Management fields and supply chain management.'
                                 },
@@ -992,7 +992,7 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                                 >
                                     <div style={{
                                         marginBottom: '1.5rem',
-                                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                        background: member.image ? 'transparent' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                                         width: '80px',
                                         height: '80px',
                                         borderRadius: '50%',
@@ -1001,9 +1001,23 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                                         justifyContent: 'center',
                                         margin: '0 auto 1.5rem auto',
                                         color: 'white',
-                                        fontSize: '2.5rem'
+                                        fontSize: '2.5rem',
+                                        overflow: 'hidden'
                                     }}>
-                                        {member.avatar}
+                                        {member.image ? (
+                                            <img 
+                                                src={member.image} 
+                                                alt={member.name}
+                                                style={{
+                                                    width: '100%',
+                                                    height: '100%',
+                                                    objectFit: 'cover',
+                                                    objectPosition: 'center top'
+                                                }}
+                                            />
+                                        ) : (
+                                            member.avatar
+                                        )}
                                     </div>
 
                                     <h3 style={{
