@@ -7,8 +7,17 @@ import ForecastingParameters from '../DataInput/ForecastingParameters';
 import SalesChart from '../GraphVisualization/SalesChart';
 import ResultsDisplay from '../EducationalDisplay/ResultsDisplay';
 import { calculateForecast, combineDataForGraph, calculateStatistics, validateData } from '../../utils/calculations';
+import { getUserProducts } from '../../firebase/products';
+import { useAuth } from '../../contexts/AuthContext';
 
 const CalculationPage = () => {
+  const { currentUser } = useAuth();
+  
+  // Product selection state
+  const [products, setProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState('');
+  const [loadingProducts, setLoadingProducts] = useState(true);
+  
   // State management for calculation data
   const [historicalData, setHistoricalData] = useState([
     { year: 2020, sales: 1000 },
@@ -98,10 +107,33 @@ const CalculationPage = () => {
     })}`;
   };
 
+  // Load user products
+  const loadProducts = async () => {
+    if (!currentUser) {
+      setLoadingProducts(false);
+      return;
+    }
+    
+    try {
+      const userProducts = await getUserProducts(currentUser.uid);
+      setProducts(userProducts);
+      
+      // Auto-select first product if available
+      if (userProducts.length > 0) {
+        setSelectedProduct(userProducts[0].id);
+      }
+    } catch (error) {
+      console.error('Error loading products:', error);
+    } finally {
+      setLoadingProducts(false);
+    }
+  };
+
   // Fetch exchange rates on component mount
   useEffect(() => {
     fetchExchangeRates();
-  }, []);
+    loadProducts();
+  }, [currentUser]);
 
   // Handle calculation process
   const handleCalculate = async () => {
@@ -109,7 +141,15 @@ const CalculationPage = () => {
     setError('');
     
     try {
+      // Check if product is selected
+      if (!selectedProduct) {
+        setError('Please select a product before calculating the forecast.');
+        setIsCalculating(false);
+        return;
+      }
+      
       // Debug logging
+      console.log('Selected Product:', selectedProduct);
       console.log('Historical Data:', historicalData);
       console.log('Forecast Parameters:', forecastParameters);
       
@@ -544,6 +584,157 @@ const CalculationPage = () => {
           >
             Enter your historical sales data and forecasting parameters to generate accurate supply chain predictions
           </motion.p>
+        </motion.div>
+
+        {/* Product Selection Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8, duration: 0.8 }}
+          style={{
+            background: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(20px)',
+            borderRadius: '20px',
+            padding: '2rem',
+            marginBottom: '2rem',
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
+            border: '1px solid rgba(255, 255, 255, 0.3)'
+          }}
+        >
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '1.5rem',
+            flexWrap: 'wrap'
+          }}>
+            {/* Product Selection */}
+            <div style={{ flex: '1', minWidth: '250px' }}>
+              <label style={{
+                display: 'block',
+                fontSize: '1rem',
+                fontWeight: '600',
+                color: '#1a202c',
+                marginBottom: '0.8rem'
+              }}>
+                📦 Select Product for Forecasting
+              </label>
+              {loadingProducts ? (
+                <div style={{
+                  padding: '12px 16px',
+                  background: '#f3f4f6',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '12px',
+                  fontSize: '14px',
+                  color: '#6b7280'
+                }}>
+                  Loading products...
+                </div>
+              ) : products.length === 0 ? (
+                <div style={{
+                  padding: '12px 16px',
+                  background: '#fef3c7',
+                  border: '1px solid #fbbf24',
+                  borderRadius: '12px',
+                  fontSize: '14px',
+                  color: '#92400e'
+                }}>
+                  No products found. Please create a product first in the Products section.
+                </div>
+              ) : (
+                <select
+                  value={selectedProduct}
+                  onChange={(e) => setSelectedProduct(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    border: '2px solid #e2e8f0',
+                    borderRadius: '12px',
+                    fontSize: '16px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s ease',
+                    background: 'white',
+                    fontFamily: 'inherit'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                  onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
+                >
+                  <option value="">Select a product...</option>
+                  {products.map((product) => (
+                    <option key={product.id} value={product.id}>
+                      {product.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+
+            {/* Calculate Button */}
+            <motion.button
+              onClick={handleCalculate}
+              disabled={isCalculating || !selectedProduct || products.length === 0}
+              whileHover={!isCalculating && selectedProduct ? { scale: 1.05 } : {}}
+              whileTap={!isCalculating && selectedProduct ? { scale: 0.95 } : {}}
+              style={{
+                background: (!selectedProduct || products.length === 0) 
+                  ? 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)'
+                  : isCalculating 
+                    ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
+                    : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '16px',
+                padding: '16px 32px',
+                fontSize: '1.1rem',
+                fontWeight: '600',
+                cursor: (!selectedProduct || products.length === 0 || isCalculating) ? 'not-allowed' : 'pointer',
+                boxShadow: (!selectedProduct || products.length === 0) 
+                  ? '0 4px 15px rgba(156, 163, 175, 0.3)'
+                  : '0 8px 25px rgba(16, 185, 129, 0.3)',
+                transition: 'all 0.3s ease',
+                minWidth: '160px'
+              }}
+            >
+              {isCalculating ? '⏳ Calculating...' : '🚀 Calculate Forecast'}
+            </motion.button>
+          </div>
+
+          {/* Selected Product Info */}
+          {selectedProduct && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              style={{
+                marginTop: '1rem',
+                padding: '1rem',
+                background: 'rgba(102, 126, 234, 0.1)',
+                borderRadius: '12px',
+                border: '1px solid rgba(102, 126, 234, 0.2)'
+              }}
+            >
+              {(() => {
+                const product = products.find(p => p.id === selectedProduct);
+                return product ? (
+                  <div>
+                    <div style={{ 
+                      fontSize: '0.9rem', 
+                      fontWeight: '600', 
+                      color: '#667eea', 
+                      marginBottom: '0.5rem' 
+                    }}>
+                      Selected Product: {product.name}
+                    </div>
+                    <div style={{ 
+                      fontSize: '0.8rem', 
+                      color: '#4a5568' 
+                    }}>
+                      {product.description || 'No description available'}
+                    </div>
+                  </div>
+                ) : null;
+              })()}
+            </motion.div>
+          )}
         </motion.div>
 
         {/* Main Content */}

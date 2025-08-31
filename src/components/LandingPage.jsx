@@ -822,20 +822,17 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                             {[
                                 {
                                     text: "Forecastify has transformed how we teach supply chain forecasting. The step-by-step approach helps students grasp complex concepts easily.",
-                                    author: "Dr. Sarah Chen",
-                                    role: "Professor of Supply Chain Management",
+                                    author: "Anonymous Educator",
                                     avatar: "👩‍🏫"
                                 },
                                 {
                                     text: "As an educator, I love how it demonstrates real-world supply chain forecasting applications. My students now understand demand planning fundamentals!",
-                                    author: "Dr. Michael Rodriguez",
-                                    role: "Supply Chain Management Instructor",
+                                    author: "Anonymous Instructor",
                                     avatar: "👨‍🏫"
                                 },
                                 {
                                     text: "Perfect for learning supply chain forecasting techniques. The educational approach made it easy to understand inventory planning and demand forecasting.",
-                                    author: "Emma Thompson",
-                                    role: "Supply Chain Student",
+                                    author: "Anonymous Student",
                                     avatar: "👩‍🎓"
                                 }
                             ].map((testimonial, index) => (
@@ -883,9 +880,6 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                                         <div>
                                             <div style={{ fontWeight: '600', color: '#1a202c' }}>
                                                 {testimonial.author}
-                                            </div>
-                                            <div style={{ fontSize: '0.9rem', color: '#4a5568' }}>
-                                                {testimonial.role}
                                             </div>
                                         </div>
                                     </div>

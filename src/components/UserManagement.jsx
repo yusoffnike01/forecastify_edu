@@ -188,14 +188,52 @@ const UserManagement = () => {
         padding: '1.5rem',
         border: '1px solid rgba(226, 232, 240, 0.8)'
       }}>
-        <h3 style={{
-          fontSize: '1.25rem',
-          fontWeight: '600',
-          color: '#1a202c',
-          margin: '0 0 1rem'
+        {/* Header with count and actions */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '1.5rem',
+          flexWrap: 'wrap',
+          gap: '1rem'
         }}>
-          Registered Users ({users.length})
-        </h3>
+          <div>
+            <h3 style={{
+              fontSize: '1.3rem',
+              fontWeight: '700',
+              color: '#1a202c',
+              margin: 0
+            }}>
+              Users
+            </h3>
+            <p style={{
+              fontSize: '0.9rem',
+              color: '#6b7280',
+              margin: '4px 0 0 0'
+            }}>
+              {users.length} users • See your active users and make changes
+            </p>
+          </div>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            style={{
+              background: '#f3f4f6',
+              color: '#374151',
+              border: '1px solid #d1d5db',
+              borderRadius: '8px',
+              padding: '8px 16px',
+              fontSize: '0.85rem',
+              fontWeight: '500',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}
+          >
+            ⬇️ Download CSV
+          </motion.button>
+        </div>
 
         {loading ? (
           <div style={{ 
@@ -215,67 +253,125 @@ const UserManagement = () => {
           </div>
         ) : (
           <div style={{
-            display: 'grid',
-            gap: '1rem'
+            border: '1px solid #e5e7eb',
+            borderRadius: '12px',
+            overflow: 'hidden',
+            background: 'white'
           }}>
-            {users.map((user) => (
+            {/* Table Header */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1.5fr 100px 120px 100px',
+              background: '#f9fafb',
+              borderBottom: '1px solid #e5e7eb',
+              fontSize: '0.8rem',
+              fontWeight: '600',
+              color: '#374151',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em'
+            }}>
+              <div style={{ padding: '12px 16px' }}>Name</div>
+              <div style={{ padding: '12px 16px' }}>Email</div>
+              <div style={{ padding: '12px 16px' }}>Role</div>
+              <div style={{ padding: '12px 16px' }}>Created</div>
+              <div style={{ padding: '12px 16px', textAlign: 'center' }}>Actions</div>
+            </div>
+
+            {/* Table Rows */}
+            {users.map((user, index) => (
               <motion.div
                 key={user.id}
-                whileHover={{ scale: 1.02 }}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.05 }}
                 style={{
-                  background: 'white',
-                  padding: '1rem 1.5rem',
-                  borderRadius: '12px',
-                  boxShadow: '0 4px 15px rgba(0, 0, 0, 0.05)',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  border: '1px solid rgba(226, 232, 240, 0.8)'
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1.5fr 100px 120px 100px',
+                  borderBottom: index < users.length - 1 ? '1px solid #f3f4f6' : 'none',
+                  transition: 'background-color 0.2s ease',
+                  cursor: 'pointer'
                 }}
+                whileHover={{ backgroundColor: '#f9fafb' }}
               >
-                <div>
-                  <div style={{
-                    fontSize: '16px',
-                    fontWeight: '600',
-                    color: '#1a202c',
-                    marginBottom: '4px'
-                  }}>
-                    {user.displayName || 'No name'}
-                  </div>
-                  <div style={{
-                    fontSize: '14px',
-                    color: '#667eea',
-                    marginBottom: '4px'
-                  }}>
-                    {user.email}
-                  </div>
-                  <div style={{
-                    fontSize: '12px',
-                    color: '#4a5568'
-                  }}>
-                    Role: {user.role || 'student'} • Created: {user.createdAt?.toDate?.()?.toLocaleDateString() || 'N/A'}
-                  </div>
+                <div style={{ 
+                  padding: '16px', 
+                  display: 'flex', 
+                  alignItems: 'center',
+                  fontSize: '0.9rem',
+                  fontWeight: '500',
+                  color: '#1f2937'
+                }}>
+                  {user.displayName || 'No name'}
                 </div>
-
-                {user.uid !== currentUser?.uid && (
-                  <motion.button
-                    onClick={() => handleDeleteUser(user.id, user.displayName)}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    style={{
-                      background: 'rgba(239, 68, 68, 0.1)',
-                      color: '#dc2626',
-                      border: '1px solid rgba(239, 68, 68, 0.2)',
-                      padding: '8px 16px',
-                      borderRadius: '8px',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    Delete
-                  </motion.button>
-                )}
+                <div style={{ 
+                  padding: '16px', 
+                  fontSize: '0.85rem',
+                  color: '#667eea',
+                  lineHeight: '1.4',
+                  display: 'flex',
+                  alignItems: 'center'
+                }}>
+                  {user.email}
+                </div>
+                <div style={{ 
+                  padding: '16px', 
+                  fontSize: '0.8rem',
+                  color: '#6b7280',
+                  display: 'flex',
+                  alignItems: 'center'
+                }}>
+                  <span style={{
+                    background: user.role === 'admin' ? '#fef3c7' : user.role === 'lecturer' ? '#ddd6fe' : '#dcfce7',
+                    color: user.role === 'admin' ? '#92400e' : user.role === 'lecturer' ? '#5b21b6' : '#166534',
+                    padding: '2px 8px',
+                    borderRadius: '12px',
+                    fontSize: '0.7rem',
+                    fontWeight: '500',
+                    textTransform: 'capitalize'
+                  }}>
+                    {user.role || 'student'}
+                  </span>
+                </div>
+                <div style={{ 
+                  padding: '16px', 
+                  fontSize: '0.8rem',
+                  color: '#9ca3af',
+                  display: 'flex',
+                  alignItems: 'center'
+                }}>
+                  {user.createdAt?.toDate?.()?.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                  }) || 'N/A'}
+                </div>
+                <div style={{ 
+                  padding: '16px', 
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}>
+                  {user.uid !== currentUser?.uid && (
+                    <motion.button
+                      onClick={() => handleDeleteUser(user.id, user.displayName)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      style={{
+                        background: '#ef4444',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        padding: '6px 12px',
+                        fontSize: '0.7rem',
+                        cursor: 'pointer',
+                        fontWeight: '500'
+                      }}
+                      title="Delete User"
+                    >
+                      Delete
+                    </motion.button>
+                  )}
+                </div>
               </motion.div>
             ))}
           </div>

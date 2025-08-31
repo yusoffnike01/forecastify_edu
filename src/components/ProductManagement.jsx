@@ -14,6 +14,10 @@ const ProductManagement = () => {
     description: ''
   });
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+
   const loadProducts = useCallback(async () => {
     if (!currentUser) return;
     setLoading(true);
@@ -116,6 +120,28 @@ const ProductManagement = () => {
     setFormData({ name: '', description: '' });
     setShowAddForm(false);
     setEditingProduct(null);
+  };
+
+  // Pagination logic
+  const totalPages = Math.ceil(products.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentProducts = products.slice(startIndex, endIndex);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
   };
 
   return (
@@ -250,37 +276,6 @@ const ProductManagement = () => {
           </motion.p>
         </motion.div>
 
-        {/* Add Product Button */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.9 }}
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            marginBottom: '2rem'
-          }}
-        >
-          <motion.button
-            onClick={() => setShowAddForm(true)}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            style={{
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              color: 'white',
-              border: 'none',
-              borderRadius: '16px',
-              padding: '16px 32px',
-              fontSize: '1.1rem',
-              fontWeight: '600',
-              cursor: 'pointer',
-              boxShadow: '0 8px 25px rgba(102, 126, 234, 0.3)',
-              transition: 'all 0.3s ease'
-            }}
-          >
-            ➕ Add New Product
-          </motion.button>
-        </motion.div>
 
         {/* Add/Edit Product Form */}
         <AnimatePresence>
@@ -440,15 +435,76 @@ const ProductManagement = () => {
             border: '1px solid rgba(255, 255, 255, 0.3)'
           }}
         >
-          <h3 style={{
-            fontSize: '1.5rem',
-            fontWeight: '700',
-            color: '#1a202c',
+          {/* Header with count and download button */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
             marginBottom: '1.5rem',
-            textAlign: 'center'
+            flexWrap: 'wrap',
+            gap: '1rem'
           }}>
-            📋 Product Collection ({products.length})
-          </h3>
+            <div>
+              <h3 style={{
+                fontSize: '1.3rem',
+                fontWeight: '700',
+                color: '#1a202c',
+                margin: 0
+              }}>
+                Products
+              </h3>
+              <p style={{
+                fontSize: '0.9rem',
+                color: '#6b7280',
+                margin: '4px 0 0 0'
+              }}>
+                {products.length} products • See your active products and make changes
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <motion.button
+                onClick={() => setShowAddForm(true)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                style={{
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '8px 16px',
+                  fontSize: '0.85rem',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)'
+                }}
+              >
+                ➕ Add New Product
+              </motion.button>
+              
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                style={{
+                  background: '#f3f4f6',
+                  color: '#374151',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '8px',
+                  padding: '8px 16px',
+                  fontSize: '0.85rem',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                ⬇️ Download CSV
+              </motion.button>
+            </div>
+          </div>
 
           {products.length === 0 ? (
             <div style={{
@@ -466,106 +522,256 @@ const ProductManagement = () => {
             </div>
           ) : (
             <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-              gap: '1.5rem'
+              border: '1px solid #e5e7eb',
+              borderRadius: '12px',
+              overflow: 'hidden',
+              background: 'white'
             }}>
-              {products.map((product, index) => (
+              {/* Table Header */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 2fr 150px 120px',
+                background: '#f9fafb',
+                borderBottom: '1px solid #e5e7eb',
+                fontSize: '0.8rem',
+                fontWeight: '600',
+                color: '#374151',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em'
+              }}>
+                <div style={{ padding: '12px 16px' }}>
+                  Name
+                </div>
+                <div style={{ padding: '12px 16px' }}>Description</div>
+                <div style={{ padding: '12px 16px' }}>Created</div>
+                <div style={{ padding: '12px 16px', textAlign: 'center' }}>Actions</div>
+              </div>
+              {/* Table Rows */}
+              {currentProducts.map((product, index) => (
                 <motion.div
                   key={product.id}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ y: -4, scale: 1.02 }}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
                   style={{
-                    background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-                    borderRadius: '16px',
-                    padding: '1.5rem',
-                    border: '1px solid #e2e8f0',
-                    transition: 'all 0.3s ease'
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 2fr 150px 120px',
+                    borderBottom: index < currentProducts.length - 1 ? '1px solid #f3f4f6' : 'none',
+                    transition: 'background-color 0.2s ease',
+                    cursor: 'pointer'
                   }}
+                  whileHover={{ backgroundColor: '#f9fafb' }}
                 >
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-start',
-                    marginBottom: '1rem'
+                  <div style={{ 
+                    padding: '16px', 
+                    display: 'flex', 
+                    alignItems: 'center',
+                    fontSize: '0.9rem',
+                    fontWeight: '500',
+                    color: '#1f2937'
                   }}>
-                    <div>
-                      <h4 style={{
-                        fontSize: '1.2rem',
-                        fontWeight: '600',
-                        color: '#1a202c',
-                        marginBottom: '0.5rem'
-                      }}>
-                        {product.name}
-                      </h4>
-                    </div>
-                    <div style={{
-                      display: 'flex',
-                      gap: '0.5rem'
-                    }}>
-                      <motion.button
-                        onClick={() => handleEditProduct(product)}
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        style={{
-                          background: '#f59e0b',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '8px',
-                          padding: '8px',
-                          fontSize: '0.9rem',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        ✏️
-                      </motion.button>
-                      <motion.button
-                        onClick={() => handleDeleteProduct(product)}
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        style={{
-                          background: '#dc2626',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '8px',
-                          padding: '8px',
-                          fontSize: '0.9rem',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        🗑️
-                      </motion.button>
-                    </div>
+                    {product.name}
                   </div>
-
-                  <div style={{ marginBottom: '1rem' }}>
-                    {product.description && (
-                      <p style={{
-                        fontSize: '0.95rem',
-                        color: '#4a5568',
-                        lineHeight: '1.6',
-                        margin: 0
-                      }}>
-                        {product.description}
-                      </p>
-                    )}
+                  <div style={{ 
+                    padding: '16px', 
+                    fontSize: '0.85rem',
+                    color: '#6b7280',
+                    lineHeight: '1.4'
+                  }}>
+                    {product.description || 'No description'}
                   </div>
-
-                  <div style={{
+                  <div style={{ 
+                    padding: '16px', 
                     fontSize: '0.8rem',
-                    color: '#9ca3af',
-                    borderTop: '1px solid #e5e7eb',
-                    paddingTop: '0.5rem'
+                    color: '#9ca3af'
                   }}>
-                    Created: {new Date(product.createdAt?.toDate ? product.createdAt.toDate() : product.createdAt).toLocaleDateString()}
+                    {new Date(product.createdAt?.toDate ? product.createdAt.toDate() : product.createdAt).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric'
+                    })}
+                  </div>
+                  <div style={{ 
+                    padding: '16px', 
+                    display: 'flex',
+                    justifyContent: 'center',
+                    gap: '8px'
+                  }}>
+                    <motion.button
+                      onClick={() => handleEditProduct(product)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      style={{
+                        background: '#fbbf24',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        padding: '6px 8px',
+                        fontSize: '0.7rem',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                      title="Edit Product"
+                    >
+                      ✏️
+                    </motion.button>
+                    <motion.button
+                      onClick={() => handleDeleteProduct(product)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      style={{
+                        background: '#ef4444',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        padding: '6px 8px',
+                        fontSize: '0.7rem',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                      title="Delete Product"
+                    >
+                      🗑️
+                    </motion.button>
                   </div>
                 </motion.div>
               ))}
             </div>
           )}
         </motion.div>
+
+        {/* Pagination Controls */}
+        {products.length > itemsPerPage && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.3 }}
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginTop: '1.5rem',
+              padding: '1rem 2rem',
+              background: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(20px)',
+              borderRadius: '16px',
+              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              flexWrap: 'wrap',
+              gap: '1rem'
+            }}
+          >
+            {/* Results Info */}
+            <div style={{
+              fontSize: '0.9rem',
+              color: '#6b7280',
+              fontWeight: '500'
+            }}>
+              Showing {startIndex + 1} to {Math.min(endIndex, products.length)} of {products.length} products
+            </div>
+
+            {/* Pagination Navigation */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}>
+              {/* Previous Button */}
+              <motion.button
+                onClick={handlePrevPage}
+                disabled={currentPage === 1}
+                whileHover={currentPage > 1 ? { scale: 1.05 } : {}}
+                whileTap={currentPage > 1 ? { scale: 0.95 } : {}}
+                style={{
+                  background: currentPage === 1 ? '#f3f4f6' : '#667eea',
+                  color: currentPage === 1 ? '#9ca3af' : 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '8px 12px',
+                  fontSize: '0.85rem',
+                  fontWeight: '500',
+                  cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                ← Previous
+              </motion.button>
+
+              {/* Page Numbers */}
+              <div style={{ display: 'flex', gap: '0.25rem' }}>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => {
+                  // Show first page, last page, current page, and pages around current page
+                  const showPage = pageNum === 1 || 
+                                   pageNum === totalPages || 
+                                   Math.abs(pageNum - currentPage) <= 1;
+                  
+                  if (!showPage) {
+                    if (pageNum === currentPage - 2 || pageNum === currentPage + 2) {
+                      return (
+                        <span key={pageNum} style={{
+                          padding: '8px 4px',
+                          fontSize: '0.85rem',
+                          color: '#9ca3af'
+                        }}>
+                          ...
+                        </span>
+                      );
+                    }
+                    return null;
+                  }
+
+                  return (
+                    <motion.button
+                      key={pageNum}
+                      onClick={() => handlePageChange(pageNum)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.95 }}
+                      style={{
+                        background: currentPage === pageNum ? '#667eea' : '#f9fafb',
+                        color: currentPage === pageNum ? 'white' : '#374151',
+                        border: currentPage === pageNum ? 'none' : '1px solid #e5e7eb',
+                        borderRadius: '6px',
+                        padding: '6px 10px',
+                        fontSize: '0.8rem',
+                        fontWeight: currentPage === pageNum ? '600' : '500',
+                        cursor: 'pointer',
+                        minWidth: '32px',
+                        transition: 'all 0.2s ease'
+                      }}
+                    >
+                      {pageNum}
+                    </motion.button>
+                  );
+                })}
+              </div>
+
+              {/* Next Button */}
+              <motion.button
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+                whileHover={currentPage < totalPages ? { scale: 1.05 } : {}}
+                whileTap={currentPage < totalPages ? { scale: 0.95 } : {}}
+                style={{
+                  background: currentPage === totalPages ? '#f3f4f6' : '#667eea',
+                  color: currentPage === totalPages ? '#9ca3af' : 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '8px 12px',
+                  fontSize: '0.85rem',
+                  fontWeight: '500',
+                  cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                Next →
+              </motion.button>
+            </div>
+          </motion.div>
+        )}
 
         {/* Enhanced Delete Confirmation Modal */}
         <AnimatePresence>
