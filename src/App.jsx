@@ -13,6 +13,7 @@ import './App.css';
 
 function AppContent() {
   const [currentPage, setCurrentPage] = useState('home');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { currentUser } = useAuth();
 
   // Auto-redirect authenticated users to calculation page
@@ -120,8 +121,8 @@ function AppContent() {
               </div>
             </div>
 
-            {/* Navigation Menu */}
-            <nav style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+            {/* Desktop Navigation Menu */}
+            <nav className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
               <motion.button
                 onClick={() => setCurrentPage('calculation')}
                 initial={{ opacity: 0, y: -10 }}
@@ -234,8 +235,166 @@ function AppContent() {
                 Logout
               </motion.button>
             </nav>
+
+            {/* Mobile Menu Button */}
+            <motion.button
+              className="mobile-menu-btn"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.8, duration: 0.5 }}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              style={{
+                display: 'none',
+                background: 'none',
+                border: 'none',
+                fontSize: '24px',
+                cursor: 'pointer',
+                color: '#4a5568'
+              }}
+            >
+              ☰
+            </motion.button>
           </div>
         </motion.header>
+      )}
+
+      {/* Mobile Menu Overlay */}
+      {(currentPage === 'calculation' || currentPage === 'users' || currentPage === 'help') && (
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: 'rgba(0, 0, 0, 0.5)',
+                zIndex: 1000,
+                display: 'none'
+              }}
+              className="mobile-menu-overlay"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <motion.div
+                initial={{ x: '-100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '-100%' }}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '280px',
+                  height: '100vh',
+                  background: 'white',
+                  boxShadow: '4px 0 20px rgba(0, 0, 0, 0.15)',
+                  padding: '80px 0 2rem 0',
+                  display: 'flex',
+                  flexDirection: 'column'
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Mobile Menu Items */}
+                <div style={{ padding: '0 2rem' }}>
+                  <motion.button
+                    onClick={() => {
+                      setCurrentPage('calculation');
+                      setIsMobileMenuOpen(false);
+                    }}
+                    whileHover={{ x: 8 }}
+                    style={{
+                      width: '100%',
+                      padding: '16px 0',
+                      background: 'none',
+                      border: 'none',
+                      textAlign: 'left',
+                      fontSize: '1.1rem',
+                      fontWeight: currentPage === 'calculation' ? '600' : '500',
+                      color: currentPage === 'calculation' ? '#667eea' : '#4a5568',
+                      cursor: 'pointer',
+                      borderBottom: '1px solid #e2e8f0'
+                    }}
+                  >
+                    📊 Forecasting
+                  </motion.button>
+
+                  <motion.button
+                    onClick={() => {
+                      setCurrentPage('users');
+                      setIsMobileMenuOpen(false);
+                    }}
+                    whileHover={{ x: 8 }}
+                    style={{
+                      width: '100%',
+                      padding: '16px 0',
+                      background: 'none',
+                      border: 'none',
+                      textAlign: 'left',
+                      fontSize: '1.1rem',
+                      fontWeight: currentPage === 'users' ? '600' : '500',
+                      color: currentPage === 'users' ? '#667eea' : '#4a5568',
+                      cursor: 'pointer',
+                      borderBottom: '1px solid #e2e8f0'
+                    }}
+                  >
+                    👥 User Management
+                  </motion.button>
+
+                  <motion.button
+                    onClick={() => {
+                      setCurrentPage('help');
+                      setIsMobileMenuOpen(false);
+                    }}
+                    whileHover={{ x: 8 }}
+                    style={{
+                      width: '100%',
+                      padding: '16px 0',
+                      background: 'none',
+                      border: 'none',
+                      textAlign: 'left',
+                      fontSize: '1.1rem',
+                      fontWeight: currentPage === 'help' ? '600' : '500',
+                      color: currentPage === 'help' ? '#667eea' : '#4a5568',
+                      cursor: 'pointer',
+                      borderBottom: '1px solid #e2e8f0'
+                    }}
+                  >
+                    💡 Help
+                  </motion.button>
+
+                  <motion.button
+                    onClick={() => {
+                      handleLogout();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    whileHover={{ x: 8 }}
+                    style={{
+                      width: '100%',
+                      padding: '16px 0',
+                      background: 'none',
+                      border: 'none',
+                      textAlign: 'left',
+                      fontSize: '1.1rem',
+                      fontWeight: '500',
+                      color: '#dc2626',
+                      cursor: 'pointer',
+                      marginTop: '2rem'
+                    }}
+                  >
+                    🚪 Logout
+                  </motion.button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       )}
 
       {/* Main Content */}
