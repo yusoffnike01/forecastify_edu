@@ -493,7 +493,7 @@ const ProductManagement = () => {
                 ➕ Add New Product
               </motion.button>
               
-              <motion.button
+              {/* <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 style={{
@@ -511,7 +511,7 @@ const ProductManagement = () => {
                 }}
               >
                 ⬇️ Download CSV
-              </motion.button>
+              </motion.button> */}
             </div>
           </div>
 

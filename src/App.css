@@ -5,6 +5,67 @@
   text-align: center;
 }
 
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Admin badge shine animation */
+@keyframes shine {
+  0% {
+    left: -100%;
+  }
+  50% {
+    left: 100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Responsive design for navigation */
+@media (max-width: 768px) {
+  .desktop-nav {
+    display: none !important;
+  }
+  
+  .mobile-menu-btn {
+    display: block !important;
+  }
+  
+  .mobile-menu-overlay {
+    display: block !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .desktop-nav {
+    display: flex !important;
+  }
+  
+  .mobile-menu-btn {
+    display: none !important;
+  }
+  
+  .mobile-menu-overlay {
+    display: none !important;
+  }
+}
+
+/* Responsive user email display */
+@media (max-width: 1200px) {
+  .desktop-nav .user-email-display span {
+    max-width: 120px !important;
+  }
+}
+
+@media (max-width: 992px) {
+  .desktop-nav .user-email-display span {
+    max-width: 100px !important;
+  }
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;

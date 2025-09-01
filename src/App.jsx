@@ -6,7 +6,7 @@ import HelpScreen from './components/Help/HelpScreen';
 import ProtectedRoute from './components/ProtectedRoute';
 import SessionTimer from './components/SessionTimer';
 import { TypingText, FadeUpText } from './components/AnimatedText';
-import UserManagement from './components/UserManagement';
+import UserManagement from './components/UserManagement/UserManagement';
 import ProductManagement from './components/ProductManagement';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { signOutUser } from './firebase/auth';
@@ -162,27 +162,110 @@ function AppContent() {
 
             {/* Desktop Navigation Menu */}
             <nav className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-              <motion.button
-                onClick={() => setCurrentPage('calculation')}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5, duration: 0.5 }}
-                whileHover={{ scale: 1.05 }}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: currentPage === 'calculation' ? '#1a202c' : '#4a5568',
-                  textDecoration: 'none',
-                  fontWeight: currentPage === 'calculation' ? '600' : '500',
-                  fontSize: '0.95rem',
-                  padding: '8px 16px',
-                  borderRadius: '8px',
-                  transition: 'all 0.3s ease',
-                  cursor: 'pointer'
-                }}
-              >
-                Forecasting
-              </motion.button>
+              {/* Forecasting Button with User Email */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <motion.button
+                  onClick={() => setCurrentPage('calculation')}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5, duration: 0.5 }}
+                  whileHover={{ scale: 1.05 }}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: currentPage === 'calculation' ? '#1a202c' : '#4a5568',
+                    textDecoration: 'none',
+                    fontWeight: currentPage === 'calculation' ? '600' : '500',
+                    fontSize: '0.95rem',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    transition: 'all 0.3s ease',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Forecasting
+                </motion.button>
+                
+                {/* User Email Display */}
+                {currentUser && (
+                  <motion.div
+                    className="user-email-display"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.7, duration: 0.5 }}
+                    whileHover={{ scale: 1.02 }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '8px 14px',
+                      background: userRole === 'admin' 
+                        ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
+                        : 'linear-gradient(135deg, #4a5568 0%, #2d3748 100%)',
+                      borderRadius: '12px',
+                      fontSize: '0.8rem',
+                      fontWeight: '500',
+                      color: 'white',
+                      boxShadow: userRole === 'admin'
+                        ? '0 2px 8px rgba(245, 158, 11, 0.3)'
+                        : '0 2px 8px rgba(74, 85, 104, 0.2)',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      cursor: 'default',
+                      position: 'relative',
+                      overflow: 'hidden'
+                    }}
+                  >
+                    {/* Background shine effect */}
+                    <div style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: '-100%',
+                      width: '100%',
+                      height: '100%',
+                      background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+                      animation: userRole === 'admin' ? 'shine 3s ease-in-out infinite' : 'none'
+                    }} />
+                    
+                    <motion.span
+                      animate={{ scale: [1, 1.1, 1] }}
+                      transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                      style={{ fontSize: '14px', zIndex: 1 }}
+                    >
+                      {userRole === 'admin' ? '👑' : '👤'}
+                    </motion.span>
+                    <div style={{ 
+                      display: 'flex', 
+                      flexDirection: 'column',
+                      alignItems: 'flex-start',
+                      gap: '2px',
+                      zIndex: 1
+                    }}>
+                      <span style={{ 
+                        maxWidth: '140px', 
+                        overflow: 'hidden', 
+                        textOverflow: 'ellipsis', 
+                        whiteSpace: 'nowrap',
+                        textShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
+                        fontSize: '0.8rem',
+                        fontWeight: '600'
+                      }}>
+                        {currentUser.email}
+                      </span>
+                      {userRole === 'admin' && (
+                        <span style={{
+                          fontSize: '0.65rem',
+                          opacity: 0.9,
+                          fontWeight: '700',
+                          letterSpacing: '0.5px',
+                          textTransform: 'uppercase'
+                        }}>
+                          Admin
+                        </span>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </div>
 
               {userRole === 'admin' && (
                 <motion.button
@@ -368,6 +451,53 @@ function AppContent() {
               >
                 {/* Mobile Menu Items */}
                 <div style={{ padding: '0 2rem' }}>
+                  {/* User Info Display */}
+                  {currentUser && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      style={{
+                        padding: '16px',
+                        margin: '0 0 20px 0',
+                        background: userRole === 'admin' 
+                          ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
+                          : 'linear-gradient(135deg, #4a5568 0%, #2d3748 100%)',
+                        borderRadius: '12px',
+                        color: 'white',
+                        textAlign: 'center'
+                      }}
+                    >
+                      <div style={{
+                        fontSize: '24px',
+                        marginBottom: '8px'
+                      }}>
+                        {userRole === 'admin' ? '👑' : '👤'}
+                      </div>
+                      <div style={{
+                        fontSize: '0.9rem',
+                        fontWeight: '600',
+                        wordBreak: 'break-word',
+                        textShadow: '0 1px 2px rgba(0, 0, 0, 0.1)'
+                      }}>
+                        {currentUser.email}
+                      </div>
+                      {userRole === 'admin' && (
+                        <div style={{
+                          fontSize: '0.75rem',
+                          marginTop: '4px',
+                          opacity: 0.9,
+                          background: 'rgba(255, 255, 255, 0.2)',
+                          padding: '2px 8px',
+                          borderRadius: '8px',
+                          display: 'inline-block'
+                        }}>
+                          Admin
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+                  
                   <motion.button
                     onClick={() => {
                       setCurrentPage('calculation');

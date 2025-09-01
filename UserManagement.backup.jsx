@@ -232,6 +232,8 @@ const UserManagement = ({ user }) => {
     setEditingUser(null);
     setError('');
     setSuccess('');
+    setShowRoleDropdown(false);
+    setSearchTerm('');
   };
 
   if (loading && users.length === 0) {
@@ -856,6 +858,135 @@ const UserManagement = ({ user }) => {
         )}
       </AnimatePresence>
 
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '12px',
+                      boxShadow: loading 
+                        ? '0 2px 8px rgba(0, 0, 0, 0.1)' 
+                        : `
+                            0 8px 25px rgba(220, 38, 38, 0.35),
+                            0 2px 8px rgba(220, 38, 38, 0.2),
+                            inset 0 2px 0 rgba(255, 255, 255, 0.15),
+                            inset 0 -2px 0 rgba(0, 0, 0, 0.1)
+                          `,
+                      position: 'relative',
+                      overflow: 'hidden',
+                      textTransform: 'none',
+                      letterSpacing: '0.02em',
+                      textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)'
+                    }}
+                    onMouseOver={(e) => {
+                      if (!loading) {
+                        e.target.style.background = 'linear-gradient(145deg, #ef4444, #dc2626, #b91c1c)';
+                      }
+                    }}
+                    onMouseOut={(e) => {
+                      if (!loading) {
+                        e.target.style.background = 'linear-gradient(145deg, #dc2626, #b91c1c, #7f1d1d)';
+                      }
+                    }}
+                  >
+                    {loading ? (
+                      <>
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
+                          style={{
+                            width: '20px',
+                            height: '20px',
+                            border: '3px solid rgba(255, 255, 255, 0.2)',
+                            borderTop: '3px solid rgba(255, 255, 255, 0.8)',
+                            borderRadius: '50%'
+                          }}
+                        />
+                        <motion.span
+                          animate={{ opacity: [0.7, 1, 0.7] }}
+                          transition={{ duration: 1.5, repeat: Infinity }}
+                        >
+                          Deleting User...
+                        </motion.span>
+                      </>
+                    ) : (
+                      <>
+                        <motion.span 
+                          style={{ fontSize: '18px' }}
+                          whileHover={{ scale: 1.2, rotate: [0, -10, 10, 0] }}
+                          transition={{ type: "spring", stiffness: 300 }}
+                        >
+                          🗑️
+                        </motion.span>
+                        <motion.span
+                          whileHover={{ x: 2 }}
+                          transition={{ type: "spring", stiffness: 400 }}
+                        >
+                          Delete Permanently
+                        </motion.span>
+                      </>
+                    )}
+                    
+                    {/* Ripple effect overlay */}
+                    {!loading && (
+                      <motion.div
+                        initial={{ scale: 0, opacity: 0.6 }}
+                        animate={{ scale: 0 }}
+                        whileHover={{ scale: 1.2, opacity: 0 }}
+                        transition={{ duration: 0.6 }}
+                        style={{
+                          position: 'absolute',
+                          inset: 0,
+                          background: 'radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%)',
+                          borderRadius: '16px',
+                          pointerEvents: 'none'
+                        }}
+                      />
+                    )}
+                  </motion.button>
+                </motion.div>
+
+                {/* Additional Safety Notice */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 1.2, type: "spring" }}
+                  style={{
+                    marginTop: '20px',
+                    padding: '12px 16px',
+                    background: 'linear-gradient(135deg, #fef3c7, #fde68a)',
+                    border: '1px solid #f59e0b',
+                    borderRadius: '12px',
+                    fontSize: '0.85rem',
+                    color: '#92400e',
+                    fontWeight: '600',
+                    textAlign: 'center',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px'
+                  }}
+                >
+                  <span style={{ fontSize: '16px' }}>⚡</span>
+                  Press <kbd style={{ 
+                    background: 'rgba(0,0,0,0.1)', 
+                    padding: '2px 6px', 
+                    borderRadius: '4px',
+                    fontSize: '0.75rem',
+                    fontWeight: '700'
+                  }}>ESC</kbd> to cancel or <kbd style={{ 
+                    background: 'rgba(0,0,0,0.1)', 
+                    padding: '2px 6px', 
+                    borderRadius: '4px',
+                    fontSize: '0.75rem',
+                    fontWeight: '700'
+                  }}>Ctrl+Enter</kbd> to delete
+                </motion.div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Delete Confirmation Modal - SIMPLE VERSION */}
       <AnimatePresence>
         {showDeleteConfirm && deletingUser && (
@@ -896,6 +1027,7 @@ const UserManagement = ({ user }) => {
               }}
               onClick={(e) => e.stopPropagation()}
             >
+              {/* Header */}
               <div style={{ textAlign: 'center', marginBottom: '24px' }}>
                 <h3 style={{
                   fontSize: '1.25rem',
@@ -914,6 +1046,7 @@ const UserManagement = ({ user }) => {
                 </p>
               </div>
 
+              {/* User Info */}
               <div style={{
                 background: '#f9fafb',
                 borderRadius: '8px',
@@ -949,9 +1082,11 @@ const UserManagement = ({ user }) => {
                 </span>
               </div>
 
+              {/* Buttons */}
               <div style={{
                 display: 'flex',
-                gap: '12px'
+                gap: '12px',
+                marginTop: '8px'
               }}>
                 <button
                   onClick={cancelDeleteUser}
