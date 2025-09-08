@@ -119,10 +119,6 @@ const CalculationPage = () => {
       const allProducts = await getAllProducts();
       setProducts(allProducts);
       
-      // Auto-select first product if available
-      if (allProducts.length > 0) {
-        setSelectedProduct(allProducts[0].id);
-      }
     } catch (error) {
       console.error('Error loading products:', error);
     } finally {
@@ -130,10 +126,6 @@ const CalculationPage = () => {
     }
   };
 
-  // Handle product selection
-  const handleProductSelect = (e) => {
-    setSelectedProduct(e.target.value);
-  };
 
   // Fetch exchange rates on component mount
   useEffect(() => {
@@ -285,11 +277,10 @@ const CalculationPage = () => {
       yPosition += 12;
 
       // Product name if selected
-      const selectedProductObj = selectedProduct ? products.find(p => p.id === selectedProduct) : null;
-      if (selectedProductObj) {
+      if (selectedProduct) {
         pdf.setFontSize(12);
         pdf.setFont('helvetica', 'bold');
-        pdf.text(`Product: ${selectedProductObj.name}`, pageWidth / 2, yPosition, { align: 'center' });
+        pdf.text(`Product: ${selectedProduct}`, pageWidth / 2, yPosition, { align: 'center' });
         yPosition += 8;
       }
 
@@ -299,7 +290,7 @@ const CalculationPage = () => {
         pdf.setFont('helvetica', 'bold');
         pdf.text(`Country/Region: ${selectedCountry}`, pageWidth / 2, yPosition, { align: 'center' });
         yPosition += 12;
-      } else if (selectedProductObj) {
+      } else if (selectedProduct) {
         yPosition += 4; // Add some space if only product is shown
       }
 
@@ -481,9 +472,8 @@ const CalculationPage = () => {
     csvContent += `Generated on: ${new Date().toLocaleDateString()}\n`;
     
     // Add product name to Excel if selected
-    const selectedProductObj = selectedProduct ? products.find(p => p.id === selectedProduct) : null;
-    if (selectedProductObj) {
-      csvContent += `Product: ${selectedProductObj.name}\n`;
+    if (selectedProduct) {
+      csvContent += `Product: ${selectedProduct}\n`;
     }
     
     // Add country to Excel if selected
@@ -506,8 +496,8 @@ const CalculationPage = () => {
     csvContent += `Generated on: ${new Date().toLocaleDateString()}\n`;
     
     // Add product and country info to forecasted section too
-    if (selectedProductObj) {
-      csvContent += `Product: ${selectedProductObj.name}\n`;
+    if (selectedProduct) {
+      csvContent += `Product: ${selectedProduct}\n`;
     }
     if (selectedCountry) {
       csvContent += `Country/Region: ${selectedCountry}\n`;
@@ -528,8 +518,8 @@ const CalculationPage = () => {
     csvContent += `Generated on: ${new Date().toLocaleDateString()}\n`;
     
     // Add product and country info to summary section too
-    if (selectedProductObj) {
-      csvContent += `Product: ${selectedProductObj.name}\n`;
+    if (selectedProduct) {
+      csvContent += `Product: ${selectedProduct}\n`;
     }
     if (selectedCountry) {
       csvContent += `Country/Region: ${selectedCountry}\n`;
@@ -710,9 +700,11 @@ const CalculationPage = () => {
                 No products found. Please create a product first in the Products section.
               </div>
             ) : (
-              <select
+              <input
+                type="text"
                 value={selectedProduct}
-                onChange={handleProductSelect}
+                onChange={(e) => setSelectedProduct(e.target.value)}
+                placeholder="Enter product name..."
                 style={{
                   width: '100%',
                   padding: '12px 16px',
@@ -722,19 +714,11 @@ const CalculationPage = () => {
                   outline: 'none',
                   transition: 'border-color 0.2s ease',
                   background: 'white',
-                  fontFamily: 'inherit',
-                  cursor: 'pointer'
+                  fontFamily: 'inherit'
                 }}
                 onFocus={(e) => e.target.style.borderColor = '#667eea'}
                 onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
-              >
-                <option value="">Select a product...</option>
-                {products.map((product) => (
-                  <option key={product.id} value={product.id}>
-                    {product.name} {product.description ? `- ${product.description}` : ''}
-                  </option>
-                ))}
-              </select>
+              />
             )}
           </div>
 
@@ -751,27 +735,22 @@ const CalculationPage = () => {
                 border: '1px solid rgba(102, 126, 234, 0.2)'
               }}
             >
-              {(() => {
-                const product = products.find(p => p.id === selectedProduct);
-                return product ? (
-                  <div>
-                    <div style={{ 
-                      fontSize: '0.9rem', 
-                      fontWeight: '600', 
-                      color: '#667eea', 
-                      marginBottom: '0.5rem' 
-                    }}>
-                      Selected Product: {product.name}
-                    </div>
-                    <div style={{ 
-                      fontSize: '0.8rem', 
-                      color: '#4a5568' 
-                    }}>
-                      {product.description || 'No description available'}
-                    </div>
-                  </div>
-                ) : null;
-              })()}
+              <div>
+                <div style={{ 
+                  fontSize: '0.9rem', 
+                  fontWeight: '600', 
+                  color: '#667eea', 
+                  marginBottom: '0.5rem' 
+                }}>
+                  Selected Product: {selectedProduct}
+                </div>
+                <div style={{ 
+                  fontSize: '0.8rem', 
+                  color: '#4a5568' 
+                }}>
+                  Manual product entry
+                </div>
+              </div>
             </motion.div>
           )}
         </motion.div>
@@ -1296,7 +1275,7 @@ const CalculationPage = () => {
                   statistics={results.statistics}
                   selectedCurrency={selectedCurrency}
                   formatCurrency={formatCurrency}
-                  selectedProductName={selectedProduct ? products.find(p => p.id === selectedProduct)?.name : null}
+                  selectedProductName={selectedProduct}
                   selectedCountry={selectedCountry}
                   onExportClick={(type = 'pdf') => {
                     setExportType(type);
