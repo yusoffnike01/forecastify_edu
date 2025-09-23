@@ -942,9 +942,10 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                                 {
                                     name: 'Farizoh Binti Hamid',
                                     title: 'Senior Lecturer',
-                                    specialization: 'Supply Chain Management & Forecasting',
+                                    specialization: 'Commerce Department',
                                     image: '/images/farizo.jpeg',
-                                    description: 'Expert in supply chain fundamentals with over 10 years of experience in educational leadership.'
+                                    email: 'farizohhamid@ptsb.edu.my',
+                                    description: 'Senior Lecturer in Commerce Department, with extensive research experience in multiple fields and supply chain mgt.'
                                 },
                                 {
                                     name: 'Abdul Aziz Bin Ishak',

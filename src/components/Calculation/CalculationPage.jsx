@@ -39,6 +39,30 @@ const CalculationPage = () => {
   const [exportType, setExportType] = useState('pdf');
   const [selectedCurrency, setSelectedCurrency] = useState('MYR');
   const [selectedCountry, setSelectedCountry] = useState('');
+  // Define popular countries with their currencies
+  const popularCountries = [
+    { country: 'Malaysia', currency: 'MYR', flag: '🇲🇾', symbol: 'RM' },
+    { country: 'United States', currency: 'USD', flag: '🇺🇸', symbol: '$' },
+    { country: 'European Union', currency: 'EUR', flag: '🇪🇺', symbol: '€' },
+    { country: 'United Kingdom', currency: 'GBP', flag: '🇬🇧', symbol: '£' },
+    { country: 'Japan', currency: 'JPY', flag: '🇯🇵', symbol: '¥' },
+    { country: 'Singapore', currency: 'SGD', flag: '🇸🇬', symbol: 'S$' },
+    { country: 'Australia', currency: 'AUD', flag: '🇦🇺', symbol: 'A$' },
+    { country: 'Canada', currency: 'CAD', flag: '🇨🇦', symbol: 'C$' },
+    { country: 'China', currency: 'CNY', flag: '🇨🇳', symbol: '¥' },
+    { country: 'South Korea', currency: 'KRW', flag: '🇰🇷', symbol: '₩' },
+    { country: 'Thailand', currency: 'THB', flag: '🇹🇭', symbol: '฿' },
+    { country: 'Indonesia', currency: 'IDR', flag: '🇮🇩', symbol: 'Rp' },
+    { country: 'Philippines', currency: 'PHP', flag: '🇵🇭', symbol: '₱' },
+    { country: 'Vietnam', currency: 'VND', flag: '🇻🇳', symbol: '₫' },
+    { country: 'India', currency: 'INR', flag: '🇮🇳', symbol: '₹' },
+    { country: 'Hong Kong', currency: 'HKD', flag: '🇭🇰', symbol: 'HK$' },
+    { country: 'Switzerland', currency: 'CHF', flag: '🇨🇭', symbol: 'CHF' },
+    { country: 'New Zealand', currency: 'NZD', flag: '🇳🇿', symbol: 'NZ$' },
+    { country: 'Brunei', currency: 'BND', flag: '🇧🇳', symbol: 'B$' },
+    { country: 'Saudi Arabia', currency: 'SAR', flag: '🇸🇦', symbol: 'ر.س' }
+  ];
+
   const [exchangeRates, setExchangeRates] = useState({
     MYR: 1,      // Base currency (Ringgit Malaysia)
     USD: 0.22,   // 1 MYR = 0.22 USD
@@ -47,7 +71,19 @@ const CalculationPage = () => {
     JPY: 32.5,   // 1 MYR = 32.5 JPY
     SGD: 0.30,   // 1 MYR = 0.30 SGD
     AUD: 0.33,   // 1 MYR = 0.33 AUD
-    CAD: 0.30    // 1 MYR = 0.30 CAD
+    CAD: 0.30,   // 1 MYR = 0.30 CAD
+    CNY: 1.55,   // 1 MYR = 1.55 CNY (Chinese Yuan)
+    KRW: 290,    // 1 MYR = 290 KRW (South Korean Won)
+    THB: 7.8,    // 1 MYR = 7.8 THB (Thai Baht)
+    IDR: 3400,   // 1 MYR = 3400 IDR (Indonesian Rupiah)
+    PHP: 12.8,   // 1 MYR = 12.8 PHP (Philippine Peso)
+    VND: 5500,   // 1 MYR = 5500 VND (Vietnamese Dong)
+    INR: 18.5,   // 1 MYR = 18.5 INR (Indian Rupee)
+    HKD: 1.72,   // 1 MYR = 1.72 HKD (Hong Kong Dollar)
+    CHF: 0.20,   // 1 MYR = 0.20 CHF (Swiss Franc)
+    NZD: 0.37,   // 1 MYR = 0.37 NZD (New Zealand Dollar)
+    BND: 0.30,   // 1 MYR = 0.30 BND (Brunei Dollar)
+    SAR: 0.83    // 1 MYR = 0.83 SAR (Saudi Riyal)
   });
   const [isLoadingRates, setIsLoadingRates] = useState(false);
 
@@ -60,20 +96,20 @@ const CalculationPage = () => {
       const data = await response.json();
       
       if (data && data.rates) {
-        setExchangeRates({
-          MYR: 1,
-          USD: data.rates.USD || 0.22,
-          EUR: data.rates.EUR || 0.20,
-          GBP: data.rates.GBP || 0.17,
-          JPY: data.rates.JPY || 32.5,
-          SGD: data.rates.SGD || 0.30,
-          AUD: data.rates.AUD || 0.33,
-          CAD: data.rates.CAD || 0.30
+        // Build rates object from our popular countries
+        const updatedRates = { MYR: 1 }; // Base currency
+        
+        popularCountries.forEach(country => {
+          if (country.currency !== 'MYR') {
+            updatedRates[country.currency] = data.rates[country.currency] || exchangeRates[country.currency];
+          }
         });
-        console.log('Live exchange rates updated successfully');
+        
+        setExchangeRates(updatedRates);
+        console.log('✅ Live exchange rates updated for', Object.keys(updatedRates).length, 'currencies');
       }
     } catch (error) {
-      console.warn('Failed to fetch live rates, using default rates:', error);
+      console.warn('❌ Failed to fetch live rates, using default rates:', error);
       // Keep default rates if API fails
     } finally {
       setIsLoadingRates(false);
@@ -91,18 +127,12 @@ const CalculationPage = () => {
   // Format currency display
   const formatCurrency = (amount, currency = selectedCurrency) => {
     const convertedAmount = convertCurrency(amount);
-    const currencySymbols = {
-      USD: '$',
-      EUR: '€',
-      GBP: '£',
-      JPY: '¥',
-      MYR: 'RM',
-      SGD: 'S$',
-      AUD: 'A$',
-      CAD: 'C$'
-    };
     
-    return `${currencySymbols[currency] || currency} ${convertedAmount.toLocaleString(undefined, {
+    // Get currency symbol from popularCountries array
+    const countryData = popularCountries.find(country => country.currency === currency);
+    const currencySymbol = countryData ? countryData.symbol : currency;
+    
+    return `${currencySymbol} ${convertedAmount.toLocaleString(undefined, {
       minimumFractionDigits: currency === 'JPY' ? 0 : 2,
       maximumFractionDigits: currency === 'JPY' ? 0 : 2
     })}`;
@@ -700,25 +730,134 @@ const CalculationPage = () => {
                 No products found. Please create a product first in the Products section.
               </div>
             ) : (
-              <input
-                type="text"
-                value={selectedProduct}
-                onChange={(e) => setSelectedProduct(e.target.value)}
-                placeholder="Enter product name..."
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  border: '2px solid #e2e8f0',
-                  borderRadius: '12px',
-                  fontSize: '16px',
-                  outline: 'none',
-                  transition: 'border-color 0.2s ease',
-                  background: 'white',
-                  fontFamily: 'inherit'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#667eea'}
-                onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
-              />
+              <div style={{ position: 'relative' }}>
+                {/* Icon Box */}
+                <div style={{
+                  position: 'absolute',
+                  left: '12px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  zIndex: 1,
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  borderRadius: '8px',
+                  padding: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 2px 8px rgba(102, 126, 234, 0.3)',
+                  pointerEvents: 'none'
+                }}>
+                  <svg 
+                    width="16" 
+                    height="16" 
+                    viewBox="0 0 24 24" 
+                    fill="none"
+                    style={{ color: 'white' }}
+                  >
+                    <path 
+                      d="M20 7L12 3L4 7V17L12 21L20 17V7Z" 
+                      stroke="currentColor" 
+                      strokeWidth="2" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round"
+                    />
+                    <path 
+                      d="M12 12L20 7L12 3L4 7L12 12Z" 
+                      stroke="currentColor" 
+                      strokeWidth="2" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round"
+                    />
+                    <path 
+                      d="M12 12V21" 
+                      stroke="currentColor" 
+                      strokeWidth="2" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+                
+                <select
+                  value={selectedProduct}
+                  onChange={(e) => setSelectedProduct(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '14px 50px 14px 56px',
+                    border: '2px solid #e2e8f0',
+                    borderRadius: '12px',
+                    fontSize: '16px',
+                    outline: 'none',
+                    transition: 'all 0.3s ease',
+                    background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+                    fontFamily: 'inherit',
+                    cursor: 'pointer',
+                    color: selectedProduct ? '#1a202c' : '#9ca3af',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+                    appearance: 'none',
+                    WebkitAppearance: 'none',
+                    MozAppearance: 'none'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#667eea';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1), 0 4px 12px rgba(0, 0, 0, 0.08)';
+                    e.target.style.transform = 'translateY(-1px)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#e2e8f0';
+                    e.target.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.04)';
+                    e.target.style.transform = 'translateY(0)';
+                  }}
+                >
+                  <option value="" disabled style={{ color: '#9ca3af' }}>
+                    Choose your product for forecasting...
+                  </option>
+                  {products.map((product) => (
+                    <option 
+                      key={product.id} 
+                      value={product.name}
+                      style={{ 
+                        color: '#1a202c',
+                        padding: '12px',
+                        backgroundColor: '#ffffff'
+                      }}
+                    >
+                      {product.name} • {product.category}
+                    </option>
+                  ))}
+                </select>
+                
+                {/* Custom Dropdown Arrow */}
+                <div style={{
+                  position: 'absolute',
+                  right: '16px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  pointerEvents: 'none',
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  borderRadius: '6px',
+                  padding: '6px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <svg 
+                    width="12" 
+                    height="12" 
+                    viewBox="0 0 12 12" 
+                    fill="none"
+                    style={{ color: 'white' }}
+                  >
+                    <path 
+                      d="M3 4.5L6 7.5L9 4.5" 
+                      stroke="currentColor" 
+                      strokeWidth="1.5" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+              </div>
             )}
           </div>
 
@@ -1059,14 +1198,11 @@ const CalculationPage = () => {
                     onFocus={(e) => e.target.style.borderColor = '#667eea'}
                     onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                   >
-                    <option value="MYR">🇲🇾 MYR (RM)</option>
-                    <option value="USD">🇺🇸 USD ($)</option>
-                    <option value="EUR">🇪🇺 EUR (€)</option>
-                    <option value="GBP">🇬🇧 GBP (£)</option>
-                    <option value="JPY">🇯🇵 JPY (¥)</option>
-                    <option value="SGD">🇸🇬 SGD (S$)</option>
-                    <option value="AUD">🇦🇺 AUD (A$)</option>
-                    <option value="CAD">🇨🇦 CAD (C$)</option>
+                    {popularCountries.map((country) => (
+                      <option key={country.currency} value={country.currency}>
+                        {country.flag} {country.currency} ({country.symbol})
+                      </option>
+                    ))}
                   </select>
                   <motion.button
                     onClick={fetchExchangeRates}

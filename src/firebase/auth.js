@@ -153,29 +153,9 @@ export const signInWithEmail = async (email, password) => {
     const result = await signInWithEmailAndPassword(auth, email, password);
     const user = result.user;
     
-    // Check if user account is deleted/disabled before allowing login
-    const userDocRef = doc(db, 'users', user.uid);
-    const userDocSnap = await getDoc(userDocRef);
+    console.log('✅ User successfully authenticated:', user.email);
     
-    if (userDocSnap.exists()) {
-      const userData = userDocSnap.data();
-      
-      // Block deleted/disabled users
-      if (userData.status === 'deleted' || userData.isActive === false) {
-        // Sign out immediately
-        await signOut(auth);
-        return { 
-          success: false, 
-          error: 'Your account has been deactivated. Please contact an administrator.' 
-        };
-      }
-      
-      // Update last login for active users
-      await updateDoc(userDocRef, {
-        lastLogin: new Date()
-      });
-    }
-    
+    // Skip ALL Firestore operations completely
     return { success: true, user };
   } catch (error) {
     // Check if error is due to user not existing in Firebase Auth

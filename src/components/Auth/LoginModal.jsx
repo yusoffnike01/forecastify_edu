@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { signInUser, registerUser, resetPassword } from '../../firebase/auth';
+import { signInWithEmail, registerUser, resetPassword } from '../../firebase/auth';
 
 const LoginModal = ({ isOpen, onClose, onSuccess }) => {
   const [isLogin] = useState(true); // Always login mode (no registration)
@@ -55,7 +55,7 @@ const LoginModal = ({ isOpen, onClose, onSuccess }) => {
           return;
         }
         
-        const result = await signInUser(formData.email, formData.password);
+        const result = await signInWithEmail(formData.email, formData.password);
         if (result.success) {
           onSuccess(result.user);
           onClose();
