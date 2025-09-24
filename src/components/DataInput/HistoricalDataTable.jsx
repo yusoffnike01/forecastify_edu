@@ -2,23 +2,28 @@ import { useState } from 'react';
 
 const HistoricalDataTable = ({ data, onDataChange, selectedCountry, onCountryChange }) => {
 
-  // Hardcoded list of countries
-  const countries = [
-    'Afghanistan', 'Albania', 'Algeria', 'Argentina', 'Armenia', 'Australia',
-    'Austria', 'Azerbaijan', 'Bahrain', 'Bangladesh', 'Belarus', 'Belgium',
-    'Bolivia', 'Bosnia and Herzegovina', 'Brazil', 'Brunei', 'Bulgaria', 'Cambodia',
-    'Canada', 'Chile', 'China', 'Colombia', 'Croatia', 'Czech Republic',
-    'Denmark', 'Ecuador', 'Egypt', 'Estonia', 'Ethiopia', 'Finland',
-    'France', 'Georgia', 'Germany', 'Ghana', 'Greece', 'Hungary',
-    'Iceland', 'India', 'Indonesia', 'Iran', 'Iraq', 'Ireland',
-    'Israel', 'Italy', 'Japan', 'Jordan', 'Kazakhstan', 'Kenya',
-    'Kuwait', 'Latvia', 'Lebanon', 'Lithuania', 'Luxembourg', 'Malaysia',
-    'Mexico', 'Morocco', 'Nepal', 'Netherlands', 'New Zealand', 'Nigeria',
-    'Norway', 'Pakistan', 'Peru', 'Philippines', 'Poland', 'Portugal',
-    'Qatar', 'Romania', 'Russia', 'Saudi Arabia', 'Singapore', 'Slovakia',
-    'Slovenia', 'South Africa', 'South Korea', 'Spain', 'Sri Lanka', 'Sweden',
-    'Switzerland', 'Taiwan', 'Thailand', 'Turkey', 'Ukraine', 'United Arab Emirates',
-    'United Kingdom', 'United States', 'Uruguay', 'Venezuela', 'Vietnam'
+  // Popular countries that match with currency dropdown
+  const popularCountries = [
+    { country: 'Malaysia', flag: '🇲🇾' },
+    { country: 'United States', flag: '🇺🇸' },
+    { country: 'European Union', flag: '🇪🇺' },
+    { country: 'United Kingdom', flag: '🇬🇧' },
+    { country: 'Japan', flag: '🇯🇵' },
+    { country: 'Singapore', flag: '🇸🇬' },
+    { country: 'Australia', flag: '🇦🇺' },
+    { country: 'Canada', flag: '🇨🇦' },
+    { country: 'China', flag: '🇨🇳' },
+    { country: 'South Korea', flag: '🇰🇷' },
+    { country: 'Thailand', flag: '🇹🇭' },
+    { country: 'Indonesia', flag: '🇮🇩' },
+    { country: 'Philippines', flag: '🇵🇭' },
+    { country: 'Vietnam', flag: '🇻🇳' },
+    { country: 'India', flag: '🇮🇳' },
+    { country: 'Hong Kong', flag: '🇭🇰' },
+    { country: 'Switzerland', flag: '🇨🇭' },
+    { country: 'New Zealand', flag: '🇳🇿' },
+    { country: 'Brunei', flag: '🇧🇳' },
+    { country: 'Saudi Arabia', flag: '🇸🇦' }
   ];
   const handleYearChange = (index, value) => {
     const newData = [...data];
@@ -115,9 +120,9 @@ const HistoricalDataTable = ({ data, onDataChange, selectedCountry, onCountryCha
           onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
         >
           <option value="" style={{ color: '#a0aec0' }}>Select country/region...</option>
-          {countries.map((country) => (
-            <option key={country} value={country} style={{ color: '#1a202c' }}>
-              {country}
+          {popularCountries.map((countryData) => (
+            <option key={countryData.country} value={countryData.country} style={{ color: '#1a202c' }}>
+              {countryData.flag} {countryData.country}
             </option>
           ))}
         </select>
