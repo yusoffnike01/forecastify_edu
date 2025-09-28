@@ -21,7 +21,7 @@ service cloud.firestore {
       allow write: if request.auth != null && 
         request.auth.token.email in ['tengkuyusoff19@gmail.com', 'admin@ptsb.edu.my'];
     }
-    
+    it 
     // User data collection (for user creation process)
     match /user_data/{document} {
       // Allow admins and the system to manage user creation data

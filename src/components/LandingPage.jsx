@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AnimatedText, { TypingText, FadeUpText, ScaleInText } from './AnimatedText';
 import { signInSimple, signInWithGoogleSimple, signOutSimple, resetPasswordSimple } from '../firebase/auth-simple';
@@ -15,8 +15,42 @@ const LandingPage = ({ onNavigateToCalculation }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [authError, setAuthError] = useState('');
     const [resetMessage, setResetMessage] = useState('');
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     const { currentUser, userData } = useAuth();
+
+    // Image carousel data
+    const previewImages = [
+        {
+            src: '/images/graphV1.png',
+            alt: 'Sales Forecast Chart Preview',
+            title: 'Interactive Sales Forecast Chart',
+            description: 'Visualize your historical data and forecasted trends with beautiful charts'
+        },
+        {
+            src: '/images/graphV2.png',
+            alt: 'Forecast Results & Analysis Preview',  
+            title: 'Comprehensive Results & Analysis',
+            description: 'Get detailed statistics, growth rates, and export options for your forecasts'
+        },
+        {
+            src: '/images/graphV3.png',
+            alt: 'Area Chart Forecast Preview',
+            title: 'Advanced Area Chart Visualization',
+            description: 'Multi-currency support with smooth area charts for professional presentations'
+        }
+    ];
+
+    // Auto-slide functionality
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentImageIndex((prevIndex) => 
+                (prevIndex + 1) % previewImages.length
+            );
+        }, 4000); // Change image every 4 seconds
+        
+        return () => clearInterval(interval);
+    }, [previewImages.length]);
 
     const handleSignIn = async (e) => {
         e.preventDefault();
@@ -557,11 +591,13 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                                 cursor: 'pointer'
                             }}
                         >
+                            {/* Image Slider */}
                             <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ delay: 3.6, duration: 0.8 }}
                                 style={{
+                                    position: 'relative',
                                     borderRadius: 'clamp(12px, 2vw, 16px)',
                                     overflow: 'hidden',
                                     display: 'flex',
@@ -569,18 +605,64 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                                     justifyContent: 'center'
                                 }}
                             >
-                                <img 
-                                    src="/images/Gemini_Generated_Image.png"
-                                    alt="Supply Chain Dashboard Preview"
-                                    style={{
-                                        width: '100%',
-                                        height: 'auto',
-                                        maxHeight: 'clamp(200px, 50vw, 400px)',
-                                        objectFit: 'cover',
-                                        objectPosition: 'center',
-                                        borderRadius: 'clamp(12px, 2vw, 16px)'
-                                    }}
-                                />
+                                {/* Image Container with fade transition */}
+                                <div style={{ 
+                                    position: 'relative', 
+                                    width: '100%',
+                                    overflow: 'hidden',
+                                    borderRadius: 'clamp(12px, 2vw, 16px)'
+                                }}>
+                                    <AnimatePresence mode="wait">
+                                        <motion.img
+                                            key={currentImageIndex}
+                                            src={previewImages[currentImageIndex].src}
+                                            alt={previewImages[currentImageIndex].alt}
+                                            initial={{ opacity: 0, x: 50 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            exit={{ opacity: 0, x: -50 }}
+                                            transition={{ duration: 0.6 }}
+                                            style={{
+                                                width: '100%',
+                                                height: 'auto',
+                                                maxHeight: 'clamp(200px, 50vw, 400px)',
+                                                objectFit: 'cover',
+                                                objectPosition: 'center',
+                                                display: 'block'
+                                            }}
+                                        />
+                                    </AnimatePresence>
+                                    
+                                    
+                                    {/* Dots indicator */}
+                                    <div style={{
+                                        position: 'absolute',
+                                        bottom: '12px',
+                                        left: '50%',
+                                        transform: 'translateX(-50%)',
+                                        display: 'flex',
+                                        gap: '6px',
+                                        zIndex: 10
+                                    }}>
+                                        {previewImages.map((_, index) => (
+                                            <button
+                                                key={index}
+                                                onClick={() => setCurrentImageIndex(index)}
+                                                style={{
+                                                    width: '8px',
+                                                    height: '8px',
+                                                    borderRadius: '50%',
+                                                    border: 'none',
+                                                    background: index === currentImageIndex 
+                                                        ? 'rgba(102, 126, 234, 0.9)' 
+                                                        : 'rgba(255, 255, 255, 0.7)',
+                                                    cursor: 'pointer',
+                                                    transition: 'all 0.3s ease',
+                                                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+                                                }}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
                             </motion.div>
                         </motion.div>
                     </div>

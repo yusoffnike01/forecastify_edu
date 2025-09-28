@@ -39,6 +39,10 @@ const CalculationPage = () => {
   const [exportType, setExportType] = useState('pdf');
   const [selectedCurrency, setSelectedCurrency] = useState('MYR');
   const [selectedCountry, setSelectedCountry] = useState('');
+  const [customColors, setCustomColors] = useState({
+    historical: '#3b82f6', // Default blue
+    forecasted: '#dc2626'  // Default red
+  });
   // Define popular countries with their currencies
   const popularCountries = [
     { country: 'Malaysia', currency: 'MYR', flag: '🇲🇾', symbol: 'RM' },
@@ -1202,6 +1206,8 @@ const CalculationPage = () => {
                   <option value="line">📈 Line Chart</option>
                   <option value="bar">📊 Bar Chart</option>
                   <option value="area">📉 Area Chart</option>
+                  <option value="pie">🥧 Pie Chart</option>
+                  <option value="radar">🎯 Radar Chart</option>
                 </select>
               </div>
 
@@ -1262,6 +1268,142 @@ const CalculationPage = () => {
                   >
                     {isLoadingRates ? '🔄' : '💱'}
                   </motion.button>
+                </div>
+              </div>
+
+              {/* Chart Colors Customization */}
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 'var(--space-3)',
+                flexWrap: 'wrap'
+              }}>
+                <label style={{ 
+                  fontSize: '1rem', 
+                  fontWeight: '600', 
+                  color: '#374151'
+                }}>
+                  Chart Colors:
+                </label>
+                <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'center', flexWrap: 'wrap' }}>
+                  {/* Historical Data Color */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                    <label style={{ fontSize: '0.9rem', color: '#6b7280', fontWeight: '500' }}>
+                      Historical:
+                    </label>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <input
+                        type="color"
+                        value={customColors.historical}
+                        onChange={(e) => setCustomColors(prev => ({
+                          ...prev,
+                          historical: e.target.value
+                        }))}
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '6px',
+                          border: '2px solid #e5e7eb',
+                          cursor: 'pointer',
+                          background: 'none'
+                        }}
+                        title="Choose historical data color"
+                      />
+                      <span style={{ 
+                        fontSize: '0.8rem', 
+                        color: '#9ca3af',
+                        minWidth: '60px',
+                        fontFamily: 'monospace'
+                      }}>
+                        {customColors.historical}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Forecasted Data Color */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                    <label style={{ fontSize: '0.9rem', color: '#6b7280', fontWeight: '500' }}>
+                      Forecast:
+                    </label>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <input
+                        type="color"
+                        value={customColors.forecasted}
+                        onChange={(e) => setCustomColors(prev => ({
+                          ...prev,
+                          forecasted: e.target.value
+                        }))}
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '6px',
+                          border: '2px solid #e5e7eb',
+                          cursor: 'pointer',
+                          background: 'none'
+                        }}
+                        title="Choose forecasted data color"
+                      />
+                      <span style={{ 
+                        fontSize: '0.8rem', 
+                        color: '#9ca3af',
+                        minWidth: '60px',
+                        fontFamily: 'monospace'
+                      }}>
+                        {customColors.forecasted}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Color Presets */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                    <label style={{ fontSize: '0.9rem', color: '#6b7280', fontWeight: '500' }}>
+                      Presets:
+                    </label>
+                    <div style={{ display: 'flex', gap: '4px' }}>
+                      {[
+                        { name: 'Blue/Red', historical: '#3b82f6', forecasted: '#dc2626' },
+                        { name: 'Green/Orange', historical: '#10b981', forecasted: '#f59e0b' },
+                        { name: 'Purple/Pink', historical: '#8b5cf6', forecasted: '#ec4899' },
+                        { name: 'Teal/Indigo', historical: '#14b8a6', forecasted: '#6366f1' }
+                      ].map((preset, index) => (
+                        <button
+                          key={index}
+                          onClick={() => setCustomColors({
+                            historical: preset.historical,
+                            forecasted: preset.forecasted
+                          })}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '2px',
+                            padding: '4px 8px',
+                            borderRadius: '6px',
+                            border: '1px solid #e5e7eb',
+                            background: 'white',
+                            cursor: 'pointer',
+                            fontSize: '0.75rem',
+                            transition: 'all 0.3s ease'
+                          }}
+                          onMouseEnter={(e) => e.target.style.borderColor = '#9ca3af'}
+                          onMouseLeave={(e) => e.target.style.borderColor = '#e5e7eb'}
+                          title={`Apply ${preset.name} color scheme`}
+                        >
+                          <div style={{
+                            width: '12px',
+                            height: '12px',
+                            backgroundColor: preset.historical,
+                            borderRadius: '2px'
+                          }} />
+                          <div style={{
+                            width: '12px',
+                            height: '12px',
+                            backgroundColor: preset.forecasted,
+                            borderRadius: '2px'
+                          }} />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1372,6 +1514,7 @@ const CalculationPage = () => {
                     selectedProduct={selectedProduct}
                     selectedCountry={selectedCountry}
                     selectedCurrency={selectedCurrency}
+                    customColors={customColors}
                   />
                   
                   {/* Chart Loading/Error Fallback */}
