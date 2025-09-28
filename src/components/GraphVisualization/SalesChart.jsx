@@ -1,6 +1,13 @@
 import { LineChart, Line, BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-const SalesChart = ({ data, graphType = 'line', showOriginalValues = true }) => {
+const SalesChart = ({ 
+  data, 
+  graphType = 'line', 
+  showOriginalValues = true, 
+  selectedProduct = '', 
+  selectedCountry = '',
+  selectedCurrency = 'MYR'
+}) => {
   console.log('SalesChart Data:', data); // Debug log
 
   // Modern color palette matching the new design
@@ -13,10 +20,50 @@ const SalesChart = ({ data, graphType = 'line', showOriginalValues = true }) => 
     tooltipBorder: '#cbd5e1'
   };
 
-  // Custom tooltip formatter to show units
-  const customTooltipFormatter = (value, name, props) => {
+  // Generate dynamic title based on product and country
+  const generateTitle = () => {
+    let title = "📈 Sales Forecast Chart";
+    
+    if (selectedProduct && selectedCountry) {
+      title = `📈 ${selectedProduct} Sales Forecast - ${selectedCountry}`;
+    } else if (selectedProduct) {
+      title = `📈 ${selectedProduct} Sales Forecast`;
+    } else if (selectedCountry) {
+      title = `📈 Sales Forecast - ${selectedCountry}`;
+    }
+    
+    return title;
+  };
+
+  // Generate subtitle for additional context
+  const generateSubtitle = () => {
+    const parts = [];
+    
+    if (data && data.length > 0) {
+      const historicalCount = data.filter(item => item.historical !== null && item.historical !== undefined).length;
+      const forecastedCount = data.filter(item => item.forecasted !== null && item.forecasted !== undefined).length;
+      
+      if (historicalCount > 0 && forecastedCount > 0) {
+        parts.push(`${historicalCount} historical • ${forecastedCount} forecasted data points`);
+      } else if (historicalCount > 0) {
+        parts.push(`${historicalCount} data points`);
+      }
+    }
+    
+    if (selectedCurrency && selectedCurrency !== 'units') {
+      parts.push(`Values in ${selectedCurrency}`);
+    } else {
+      parts.push('Values in units');
+    }
+    
+    return parts.join(' • ');
+  };
+
+  // Custom tooltip formatter to show units/currency
+  const customTooltipFormatter = (value, name) => {
     if (value) {
-      return [`${value.toLocaleString()} units`, name];
+      const unit = selectedCurrency && selectedCurrency !== 'units' ? selectedCurrency : 'units';
+      return [`${value.toLocaleString()} ${unit}`, name];
     }
     return [null, name];
   };
@@ -43,6 +90,12 @@ const SalesChart = ({ data, graphType = 'line', showOriginalValues = true }) => 
               stroke={colors.text}
               fontSize={window.innerWidth <= 480 ? 10 : 12}
               tick={{ fontSize: window.innerWidth <= 480 ? 10 : 12 }}
+              label={{ 
+                value: selectedCurrency && selectedCurrency !== 'units' ? `Sales (${selectedCurrency})` : 'Sales (units)', 
+                angle: -90, 
+                position: 'insideLeft',
+                style: { textAnchor: 'middle', fontSize: '12px', fill: colors.text }
+              }}
             />
             <Tooltip 
               formatter={customTooltipFormatter}
@@ -107,6 +160,12 @@ const SalesChart = ({ data, graphType = 'line', showOriginalValues = true }) => 
               stroke={colors.text}
               fontSize={window.innerWidth <= 480 ? 10 : 12}
               tick={{ fontSize: window.innerWidth <= 480 ? 10 : 12 }}
+              label={{ 
+                value: selectedCurrency && selectedCurrency !== 'units' ? `Sales (${selectedCurrency})` : 'Sales (units)', 
+                angle: -90, 
+                position: 'insideLeft',
+                style: { textAnchor: 'middle', fontSize: '12px', fill: colors.text }
+              }}
             />
             <Tooltip 
               formatter={customTooltipFormatter}
@@ -154,6 +213,12 @@ const SalesChart = ({ data, graphType = 'line', showOriginalValues = true }) => 
               stroke={colors.text}
               fontSize={window.innerWidth <= 480 ? 10 : 12}
               tick={{ fontSize: window.innerWidth <= 480 ? 10 : 12 }}
+              label={{ 
+                value: selectedCurrency && selectedCurrency !== 'units' ? `Sales (${selectedCurrency})` : 'Sales (units)', 
+                angle: -90, 
+                position: 'insideLeft',
+                style: { textAnchor: 'middle', fontSize: '12px', fill: colors.text }
+              }}
             />
             <Tooltip 
               formatter={customTooltipFormatter}
@@ -205,6 +270,12 @@ const SalesChart = ({ data, graphType = 'line', showOriginalValues = true }) => 
               stroke={colors.text}
               fontSize={window.innerWidth <= 480 ? 10 : 12}
               tick={{ fontSize: window.innerWidth <= 480 ? 10 : 12 }}
+              label={{ 
+                value: selectedCurrency && selectedCurrency !== 'units' ? `Sales (${selectedCurrency})` : 'Sales (units)', 
+                angle: -90, 
+                position: 'insideLeft',
+                style: { textAnchor: 'middle', fontSize: '12px', fill: colors.text }
+              }}
             />
             <Tooltip 
               formatter={customTooltipFormatter}
@@ -258,24 +329,78 @@ const SalesChart = ({ data, graphType = 'line', showOriginalValues = true }) => 
   };
 
   if (!data || data.length === 0) {
+    const emptyMessage = selectedProduct || selectedCountry 
+      ? `📊 No data available for ${selectedProduct ? selectedProduct : ''} ${selectedProduct && selectedCountry ? 'in' : ''} ${selectedCountry ? selectedCountry : ''}`.trim()
+      : '📊 No data available for chart';
+      
     return (
-      <div style={{ 
-        textAlign: 'center', 
-        padding: window.innerWidth <= 768 ? '20px' : '40px',
-        color: '#64748b',
-        fontSize: window.innerWidth <= 480 ? '1rem' : '1.1rem',
-        background: '#f8fafc',
-        borderRadius: '12px',
-        border: '2px dashed #cbd5e1'
-      }}>
-        📊 No data available for chart
+      <div>
+        {/* Title even when no data */}
+        <div style={{ marginBottom: '20px', textAlign: 'center' }}>
+          <h3 
+            className="section-title" 
+            style={{ 
+              fontSize: window.innerWidth <= 768 ? '1.25rem' : '1.5rem',
+              fontWeight: '700',
+              color: '#1a202c',
+              marginBottom: '8px',
+              lineHeight: '1.2'
+            }}
+          >
+            {generateTitle()}
+          </h3>
+        </div>
+        
+        <div style={{ 
+          textAlign: 'center', 
+          padding: window.innerWidth <= 768 ? '20px' : '40px',
+          color: '#64748b',
+          fontSize: window.innerWidth <= 480 ? '1rem' : '1.1rem',
+          background: '#f8fafc',
+          borderRadius: '12px',
+          border: '2px dashed #cbd5e1'
+        }}>
+          {emptyMessage}
+          <div style={{ 
+            fontSize: '0.9rem', 
+            marginTop: '8px', 
+            opacity: 0.8 
+          }}>
+            Please add historical data and calculate forecast
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
     <div>
-      <h3 className="section-title">📈 Sales Forecast Chart</h3>
+      {/* Dynamic Title */}
+      <div style={{ marginBottom: '20px', textAlign: 'center' }}>
+        <h3 
+          className="section-title" 
+          style={{ 
+            fontSize: window.innerWidth <= 768 ? '1.25rem' : '1.5rem',
+            fontWeight: '700',
+            color: '#1a202c',
+            marginBottom: '8px',
+            lineHeight: '1.2'
+          }}
+        >
+          {generateTitle()}
+        </h3>
+        
+        {/* Subtitle with context information */}
+        <div style={{
+          fontSize: window.innerWidth <= 768 ? '0.85rem' : '0.95rem',
+          color: '#64748b',
+          fontWeight: '500',
+          lineHeight: '1.4'
+        }}>
+          {generateSubtitle()}
+        </div>
+      </div>
+
       <div className="chart-container">
         <ResponsiveContainer width="100%" height={window.innerWidth <= 768 ? 300 : 400}>
           {renderChart()}

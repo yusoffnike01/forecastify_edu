@@ -424,8 +424,47 @@ const CalculationPage = () => {
       // Graph Section on Page 2
       pdf.setFontSize(16);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('Sales Forecast Chart', margin, yPosition);
-      yPosition += 10;
+      
+      // Generate dynamic chart title for PDF
+      let chartTitle = 'Sales Forecast Chart';
+      if (selectedProduct && selectedCountry) {
+        chartTitle = `${selectedProduct} Sales Forecast - ${selectedCountry}`;
+      } else if (selectedProduct) {
+        chartTitle = `${selectedProduct} Sales Forecast`;
+      } else if (selectedCountry) {
+        chartTitle = `Sales Forecast - ${selectedCountry}`;
+      }
+      
+      pdf.text(chartTitle, margin, yPosition);
+      yPosition += 8;
+      
+      // Add chart subtitle with additional info
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
+      
+      const dataPoints = results.combinedData ? results.combinedData.length : 0;
+      const historicalCount = results.combinedData ? results.combinedData.filter(item => item.historical !== null && item.historical !== undefined).length : 0;
+      const forecastedCount = results.combinedData ? results.combinedData.filter(item => item.forecasted !== null && item.forecasted !== undefined).length : 0;
+      
+      let subtitle = '';
+      if (historicalCount > 0 && forecastedCount > 0) {
+        subtitle = `${historicalCount} historical • ${forecastedCount} forecasted data points`;
+      } else if (dataPoints > 0) {
+        subtitle = `${dataPoints} data points`;
+      }
+      
+      if (selectedCurrency && selectedCurrency !== 'units') {
+        subtitle += ` • Values in ${selectedCurrency}`;
+      } else {
+        subtitle += ' • Values in units';
+      }
+      
+      if (subtitle) {
+        pdf.text(subtitle, margin, yPosition);
+        yPosition += 12;
+      } else {
+        yPosition += 4;
+      }
 
       try {
         const chartContainer = document.querySelector('.recharts-wrapper') || 
@@ -1324,34 +1363,15 @@ const CalculationPage = () => {
                   border: '1px solid rgba(255,255,255,0.2)'
                 }}
               >
-                {/* Chart Header */}
-                <div style={{
-                  textAlign: 'center',
-                  marginBottom: 'var(--space-4)'
-                }}>
-                  <h3 style={{
-                    fontSize: '1.5rem',
-                    fontWeight: '700',
-                    color: '#374151',
-                    margin: 0
-                  }}>
-                    📈 Sales Forecast Chart
-                  </h3>
-                  <p style={{
-                    fontSize: '0.9rem',
-                    color: '#6b7280',
-                    margin: '8px 0 0 0'
-                  }}>
-                    {chartType === 'line' ? 'Line Chart' : chartType === 'bar' ? 'Bar Chart' : 'Area Chart'} • {results.combinedData?.length || 0} data points • Values in <strong>units</strong>
-                  </p>
-                </div>
-                
                 {/* Chart Component */}
                 <div style={{ position: 'relative' }}>
                   <SalesChart 
                     data={results.combinedData}
                     graphType={chartType}
                     showOriginalValues={true}
+                    selectedProduct={selectedProduct}
+                    selectedCountry={selectedCountry}
+                    selectedCurrency={selectedCurrency}
                   />
                   
                   {/* Chart Loading/Error Fallback */}
