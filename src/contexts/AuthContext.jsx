@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChange, getCurrentUserData } from '../firebase/auth';
+import { onAuthStateChangeSimple, getUserDataAfterAuth } from '../firebase/auth-simple';
 
 const AuthContext = createContext();
 
@@ -17,12 +17,12 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChange(async (user) => {
+    const unsubscribe = onAuthStateChangeSimple(async (user) => {
       setCurrentUser(user);
       
       if (user) {
         // Get additional user data from Firestore
-        const result = await getCurrentUserData(user.uid);
+        const result = await getUserDataAfterAuth(user.uid);
         if (result.success) {
           setUserData(result.userData);
         }

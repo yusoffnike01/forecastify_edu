@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AnimatedText, { TypingText, FadeUpText, ScaleInText } from './AnimatedText';
-import { signInWithEmail, signInWithGoogle, signOutUser, resetPassword } from '../firebase/auth';
+import { signInSimple, signInWithGoogleSimple, signOutSimple, resetPasswordSimple } from '../firebase/auth-simple';
 import { useAuth } from '../contexts/AuthContext';
 
 const LandingPage = ({ onNavigateToCalculation }) => {
@@ -24,7 +24,7 @@ const LandingPage = ({ onNavigateToCalculation }) => {
         setAuthError('');
 
         try {
-            const result = await signInWithEmail(email, password);
+            const result = await signInSimple(email, password);
 
             if (result.success) {
                 setShowSignInModal(false);
@@ -46,7 +46,7 @@ const LandingPage = ({ onNavigateToCalculation }) => {
         setAuthError('');
 
         try {
-            const result = await signInWithGoogle();
+            const result = await signInWithGoogleSimple();
 
             if (result.success) {
                 setShowSignInModal(false);
@@ -68,7 +68,7 @@ const LandingPage = ({ onNavigateToCalculation }) => {
         setResetMessage('');
 
         try {
-            const result = await resetPassword(resetEmail);
+            const result = await resetPasswordSimple(resetEmail);
 
             if (result.success) {
                 setResetMessage('Password reset email sent! Check your inbox.');
@@ -197,7 +197,7 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                                         👋 {userData?.displayName || currentUser.email}
                                     </div>
                                     <motion.button
-                                        onClick={async () => await signOutUser()}
+                                        onClick={async () => await signOutSimple()}
                                         whileHover={{ scale: 1.02 }}
                                         whileTap={{ scale: 0.98 }}
                                         style={{
@@ -334,7 +334,7 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                                         </div>
                                         <motion.button
                                             onClick={async () => {
-                                                await signOutUser();
+                                                await signOutSimple();
                                                 setIsMobileMenuOpen(false);
                                             }}
                                             whileHover={{ scale: 1.02 }}
@@ -503,7 +503,7 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                                     maxWidth: '300px'
                                 }}
                             >
-                                {currentUser ? 'Go to Dashboard →' : 'Start Free Trial →'}
+                                {currentUser ? 'Go to Dashboard →' : 'Sign In →'}
                             </motion.button>
 
                             <motion.button

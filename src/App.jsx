@@ -8,37 +8,26 @@ import SessionTimer from './components/SessionTimer';
 import { TypingText, FadeUpText } from './components/AnimatedText';
 import UserManagement from './components/UserManagement/UserManagement';
 import ProductManagement from './components/ProductManagement';
+import FirebaseDebug from './components/Debug/FirebaseDebug';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { signOutUser } from './firebase/auth';
-import { getUserRole } from './firebase/roles';
+import { signOutSimple } from './firebase/auth-simple';
 import './App.css';
 
 function AppContent() {
   const [currentPage, setCurrentPage] = useState('home');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [userRole, setUserRole] = useState('student');
-  const { currentUser } = useAuth();
+  const { currentUser, userData } = useAuth();
 
-  // Fetch user role when user changes
+  // Get user role from AuthContext (userData from users collection)
   useEffect(() => {
-    const fetchUserRole = async () => {
-      if (currentUser?.email) {
-        try {
-          const result = await getUserRole(currentUser.email);
-          if (result.success) {
-            setUserRole(result.role);
-          }
-        } catch (error) {
-          console.error('Error fetching user role:', error);
-          setUserRole('student'); // Default to student on error
-        }
-      } else {
-        setUserRole('student'); // Default for no user
-      }
-    };
-    
-    fetchUserRole();
-  }, [currentUser]);
+    if (currentUser && userData) {
+      // Role is already available in userData from AuthContext
+      setUserRole(userData.role || 'student');
+    } else {
+      setUserRole('student'); // Default for no user
+    }
+  }, [currentUser, userData]);
 
   // Auto-redirect authenticated users to calculation page
   useEffect(() => {
@@ -86,7 +75,7 @@ function AppContent() {
 
   const handleLogout = async () => {
     try {
-      await signOutUser();
+      await signOutSimple();
       setCurrentPage('home');
     } catch (error) {
       console.error('Logout error:', error);
@@ -646,7 +635,10 @@ function AppContent() {
 
       {/* Session Timer - Show on calculation, products and users pages */}
       {(currentPage === 'calculation' || currentPage === 'products' || currentPage === 'users') && <SessionTimer />}
-
+      
+      {/* Firebase Debug Panel - Hidden for production */}
+      {/* {(process.env.NODE_ENV === 'development' || userData?.role === 'admin') && <FirebaseDebug />} */}
+      
       </div>
   );
 }
