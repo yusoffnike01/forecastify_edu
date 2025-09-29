@@ -1027,7 +1027,7 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                                     specialization: 'Commerce Department',
                                     image: '/images/farizo.jpeg',
                                     email: 'farizohhamid@ptsb.edu.my',
-                                    description: 'Senior Lecturer in Commerce Department, with extensive research experience in multiple fields and supply chain mgt.'
+                                    description: 'Senior Lecturer in Commerce Department, with extensive research experience in multiple fields and supply chain management.'
                                 },
                                 {
                                     name: 'Abdul Aziz Bin Ishak',
