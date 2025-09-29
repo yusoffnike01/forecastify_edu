@@ -624,8 +624,8 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                                             style={{
                                                 width: '100%',
                                                 height: 'auto',
-                                                maxHeight: 'clamp(200px, 50vw, 400px)',
-                                                objectFit: 'cover',
+                                                maxHeight: 'clamp(300px, 60vw, 500px)',
+                                                objectFit: 'contain',
                                                 objectPosition: 'center',
                                                 display: 'block'
                                             }}
