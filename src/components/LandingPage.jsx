@@ -1019,7 +1019,7 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                                     specialization: 'Commerce Department',
                                     image: '/images/sharifah.jpeg',
                                     email: 'sharipahkhadijah@ptsb.edu.my',
-                                    description: 'Principal Lecturer in Commerce Department, with extensive research experience in Supply Chain Management and multiple fields.'
+                                    description: 'Principal Lecturer in Commerce Department with expertise in Logistics and Supply Chain Management, multidisciplinary research and innovation, strong record of academic leadership, publications, and industry-engaged projects.'
                                 },
                                 {
                                     name: 'Farizoh Binti Hamid',
@@ -1027,7 +1027,7 @@ const LandingPage = ({ onNavigateToCalculation }) => {
                                     specialization: 'Commerce Department',
                                     image: '/images/farizo.jpeg',
                                     email: 'farizohhamid@ptsb.edu.my',
-                                    description: 'Senior Lecturer in Commerce Department, with extensive research experience in multiple fields and supply chain management.'
+                                    description: 'Senior Lecturer in Commerce Department with extensive research expertise in mathematical & statistical analysis; experience developing modules across multiple fields, especially supply chain management'
                                 },
                                 {
                                     name: 'Abdul Aziz Bin Ishak',
