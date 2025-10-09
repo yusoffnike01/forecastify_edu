@@ -9,7 +9,13 @@ const ForecastingParameters = ({ parameters, onParametersChange }) => {
 
   const handlePercentageChange = (index, value) => {
     const newParameters = [...parameters];
-    newParameters[index] = { ...newParameters[index], percentage: parseFloat(value) || 0 };
+    // Allow empty string and lone minus sign for better typing experience
+    if (value === '' || value === '-') {
+      newParameters[index] = { ...newParameters[index], percentage: value };
+    } else {
+      const parsedValue = parseFloat(value);
+      newParameters[index] = { ...newParameters[index], percentage: isNaN(parsedValue) ? 0 : parsedValue };
+    }
     onParametersChange(newParameters);
   };
 
@@ -93,11 +99,12 @@ const ForecastingParameters = ({ parameters, onParametersChange }) => {
             </div>
             <div className="table-cell">
               <input
-                type="text"
+                type="number"
                 value={param.percentage}
                 onChange={(e) => handlePercentageChange(index, e.target.value)}
                 className="table-input"
                 placeholder="10"
+                step="0.1"
               />
             </div>
             <div className="table-cell">
@@ -106,7 +113,8 @@ const ForecastingParameters = ({ parameters, onParametersChange }) => {
                 color: 'var(--gray-600)',
                 fontStyle: 'italic'
               }}>
-                {param.percentage >= 0 ? '+' : ''}{param.percentage}% from previous year
+                {param.percentage === '' || param.percentage === '-' ? '0% from previous year' : 
+                 `${typeof param.percentage === 'number' && param.percentage >= 0 ? '+' : ''}${param.percentage}% from previous year`}
               </span>
             </div>
             <div className="table-cell">
